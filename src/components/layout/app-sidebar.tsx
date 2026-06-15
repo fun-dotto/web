@@ -24,7 +24,7 @@ const navItems = [
   { title: "お知らせ", href: "/announcements", icon: BellIcon },
   {
     title: "休講・補講・教室変更",
-    href: "/lectureInformation",
+    href: "/class-changes",
     icon: BookOpenIcon,
   },
   { title: "Mac サポート", href: "/mac", icon: MonitorIcon },
