@@ -1,4 +1,6 @@
-# dotto-web
+# Dotto Web
+
+[![CI](https://github.com/fun-dotto/web/actions/workflows/ci.yml/badge.svg)](https://github.com/fun-dotto/web/actions/workflows/ci.yml)
 
 ## セットアップ
 
