@@ -173,34 +173,11 @@ export default async function Page() {
           <p className="text-label-secondary text-sm">現在、情報はありません</p>
         </div>
       ) : (
-        <div className="space-y-8">
-          <div className="sticky top-2 z-10 bg-background-primary/90 backdrop-blur supports-[backdrop-filter]:bg-background-primary/70 border border-border-primary rounded-xl p-2">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {sections.map((section) => (
-                <a
-                  key={section.type}
-                  href={`#${sectionId(section.type)}`}
-                  className="rounded-lg px-3 py-2 bg-background-secondary hover:bg-background-tertiary transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-label-primary">
-                      {sectionLabel(section.type)}
-                    </span>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full border ${typeBadgeClass(section.type)}`}
-                    >
-                      {section.items.length}件
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {sections.map((section) => (
             <section key={section.type} id={sectionId(section.type)}>
-              <div className="flex items-center gap-3 mb-3">
-                <h2 className="text-xl font-bold text-label-primary">
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-base font-bold text-label-primary">
                   {sectionLabel(section.type)}
                 </h2>
                 <span
@@ -211,50 +188,32 @@ export default async function Page() {
               </div>
 
               {section.items.length === 0 ? (
-                <div className="rounded-lg border border-border-primary bg-background-secondary px-4 py-5">
-                  <p className="text-sm text-label-secondary">
+                <div className="rounded-lg border border-border-primary bg-background-secondary px-3 py-4">
+                  <p className="text-xs text-label-secondary">
                     該当する情報はありません
                   </p>
                 </div>
               ) : (
                 <ul className="divide-y divide-border-primary rounded-lg border border-border-primary bg-background-primary">
                   {section.items.map((item) => {
-                    const { year, month, day } = formatDate(item.date);
+                    const { month, day } = formatDate(item.date);
 
                     return (
                       <li key={`${item.type}-${item.id}`}>
-                        <div className="group flex items-center gap-5 py-4 -mx-2 px-2 rounded-lg hover:bg-background-secondary transition-colors duration-200">
-                          <div className="shrink-0 w-14 flex flex-col items-center justify-center text-center tabular-nums">
-                            <span className="text-[10px] tracking-widest text-label-secondary/60">
-                              {year}
-                            </span>
-                            <span className="text-lg font-semibold leading-none text-label-primary">
-                              {month}
-                              <span className="text-label-secondary/40">/</span>
-                              {day}
-                            </span>
-                          </div>
-
-                          <span
-                            aria-hidden
-                            className="w-px self-stretch bg-border-primary"
-                          />
-
+                        <div className="flex items-baseline gap-2.5 px-3 py-2">
+                          <span className="shrink-0 text-sm font-semibold tabular-nums text-label-primary">
+                            {month}
+                            <span className="text-label-secondary/40">/</span>
+                            {day}
+                          </span>
+                          <span className="shrink-0 text-xs text-label-secondary tabular-nums">
+                            {periodLabel(item.period)}
+                          </span>
                           <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                              <span
-                                className={`text-xs px-2 py-0.5 rounded-full border ${typeBadgeClass(item.type)}`}
-                              >
-                                {typeLabel(item.type)}
-                              </span>
-                              <span className="text-xs text-label-secondary">
-                                {periodLabel(item.period)}
-                              </span>
-                            </div>
-                            <p className="font-semibold text-label-primary line-clamp-2">
+                            <p className="text-sm font-medium text-label-primary truncate">
                               {item.subjectName}
                             </p>
-                            <p className="text-sm text-label-secondary mt-1 line-clamp-2">
+                            <p className="text-xs text-label-secondary truncate">
                               {item.detail}
                             </p>
                           </div>
