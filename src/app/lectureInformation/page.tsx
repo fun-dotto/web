@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: "休講・補講・教室変更情報の一覧",
 };
 
+// 「今日」を基準にフィルタするため、ビルド時の静的化を避けてリクエストごとに描画する
+export const dynamic = "force-dynamic";
+
 type LectureInfoType = "Cancelled" | "Makeup" | "RoomChanged";
 
 type LectureInfoItem = {
@@ -46,10 +49,14 @@ function typeBadgeClass(type: LectureInfoType): string {
   return "border-border-primary text-label-secondary bg-background-secondary";
 }
 
-function sortByDateDesc(a: LectureInfoItem, b: LectureInfoItem): number {
+function isTodayOrLater(iso: string, today: number): boolean {
+  return new Date(`${iso}T00:00:00`).getTime() >= today;
+}
+
+function sortByDateAsc(a: LectureInfoItem, b: LectureInfoItem): number {
   const aTime = new Date(`${a.date}T00:00:00`).getTime();
   const bTime = new Date(`${b.date}T00:00:00`).getTime();
-  return bTime - aTime;
+  return aTime - bTime;
 }
 
 function sectionLabel(type: LectureInfoType): string {
@@ -78,6 +85,13 @@ export default async function Page() {
     !roomChangeRes.data
   );
 
+  const now = new Date();
+  const todayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).getTime();
+
   const cancelledItems: LectureInfoItem[] = hasError
     ? []
     : cancelledRes.data.cancelledClasses
@@ -89,7 +103,8 @@ export default async function Page() {
           subjectName: item.subject.name,
           detail: item.comment,
         }))
-        .sort(sortByDateDesc);
+        .filter((item) => isTodayOrLater(item.date, todayStart))
+        .sort(sortByDateAsc);
 
   const makeupItems: LectureInfoItem[] = hasError
     ? []
@@ -102,7 +117,8 @@ export default async function Page() {
           subjectName: item.subject.name,
           detail: item.comment,
         }))
-        .sort(sortByDateDesc);
+        .filter((item) => isTodayOrLater(item.date, todayStart))
+        .sort(sortByDateAsc);
 
   const roomChangedItems: LectureInfoItem[] = hasError
     ? []
@@ -115,7 +131,8 @@ export default async function Page() {
           subjectName: item.subject.name,
           detail: `${item.originalRoom.name} → ${item.newRoom.name}`,
         }))
-        .sort(sortByDateDesc);
+        .filter((item) => isTodayOrLater(item.date, todayStart))
+        .sort(sortByDateAsc);
 
   const sections: { type: LectureInfoType; items: LectureInfoItem[] }[] = [
     { type: "Cancelled", items: cancelledItems },
