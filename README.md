@@ -7,7 +7,7 @@
 3. 開発サーバーを起動
 
 ```bash
-pnpm install
+mise setup
 pnpm dev
 ```
 
