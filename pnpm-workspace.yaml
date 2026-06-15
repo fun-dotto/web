@@ -1,3 +1,7 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+packages: []
+allowBuilds:
+  '@firebase/util': false
+  msw: false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false
