@@ -1,0 +1,11 @@
+[settings]
+minimum_release_age = "7d"
+
+[tools]
+node = "24.16.0"
+pnpm = "11.5.2"
+
+[tasks.setup]
+run = [
+  "pnpm install"
+]
