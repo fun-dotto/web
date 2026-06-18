@@ -17,7 +17,7 @@ import { BellIcon, BookOpenIcon, HomeIcon, MonitorIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import DottoIcon from "@/app/icon1024.png";
+import DottoIcon from "@/assets/icon1024.png";
 
 const navItems = [
   { title: "ホーム", href: "/", icon: HomeIcon },
