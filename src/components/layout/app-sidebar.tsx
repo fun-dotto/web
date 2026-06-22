@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BellIcon, HomeIcon, MonitorIcon } from "lucide-react";
+import { BellIcon, HomeIcon, MonitorIcon,SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,6 +23,7 @@ const navItems = [
   { title: "ホーム", href: "/", icon: HomeIcon },
   { title: "お知らせ", href: "/announcements", icon: BellIcon },
   { title: "Mac サポート", href: "/mac", icon: MonitorIcon },
+  {title:"科目検索", href:"/subjects", icon: SearchIcon},
 ];
 
 export function AppSidebar() {
