@@ -43,3 +43,6 @@ next-env.d.ts
 
 # generated from openapi/openapi.yaml
 /src/types/api.d.ts
+
+# generated from public/.well-known/apple-app-site-association-{dev,stg,prd}
+/public/.well-known/apple-app-site-association
