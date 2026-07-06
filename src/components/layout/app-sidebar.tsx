@@ -13,15 +13,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BellIcon, HomeIcon, MonitorIcon,SearchIcon } from "lucide-react";
+import { BellIcon, BookOpenIcon, HomeIcon, MonitorIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import DottoIcon from "@/app/icon1024.png";
+import DottoIcon from "@/assets/icon1024.png";
 
 const navItems = [
   { title: "ホーム", href: "/", icon: HomeIcon },
   { title: "お知らせ", href: "/announcements", icon: BellIcon },
+  {
+    title: "休講・補講・教室変更",
+    href: "/class-changes",
+    icon: BookOpenIcon,
+  },
   { title: "Mac サポート", href: "/mac", icon: MonitorIcon },
   {title:"科目検索", href:"/subjects", icon: SearchIcon},
 ];

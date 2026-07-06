@@ -1,0 +1,21 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "64LEQXTB98.jp.ac.fun.dotto",
+        "paths":[ "*" ]
+      },
+      {
+        "appID": "64LEQXTB98.jp.ac.fun.dotto.prd",
+        "paths":[ "*" ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "64LEQXTB98.jp.ac.fun.dotto",
+      "64LEQXTB98.jp.ac.fun.dotto.prd"
+    ]
+  }
+}
