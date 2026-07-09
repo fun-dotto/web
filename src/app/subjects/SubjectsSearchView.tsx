@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchIcon, ChevronRightIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api";
+import type { components } from "@/types/api";
 
 const TERMS = ["前期", "後期", "通年", "第1クォーター", "第2クォーター", "第3クォーター", "第4クォーター", "夏季集中", "冬季集中"];
 const REQUIRED_TYPES = ["必修", "選択", "必修選択"];
@@ -11,13 +14,31 @@ const COURSES = ["情報システム/情報アーキテクチャ", "情報デザ
 const GRADES = ["学部1年", "学部２年", "学部3年", "学部4年", "修士１", "修士２"];
 const CLASSES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
-const MOCK_SUBJECTS = [
-  { id: "1", title: "プログラミング基礎", timeCredits: "90分  2単位", teacher: "田中 太郎" },
-  { id: "2", title: "データ構造とアルゴリズム", timeCredits: "90分  2単位", teacher: "鈴木 花子" },
-  { id: "3", title: "コンピュータネットワーク", timeCredits: "90分  2単位", teacher: "佐藤 一郎" },
-  { id: "4", title: "オブジェクト指向プログラミング", timeCredits: "90分  2単位", teacher: "山田 次郎" },
-  { id: "5", title: "データベース設計", timeCredits: "90分  2単位", teacher: "伊藤 三郎" },
-];
+const TERM_MAP: Record<string, string> = {
+  "前期": "H1", "後期": "H2", "通年": "AllYear",
+  "第1クォーター": "Q1", "第2クォーター": "Q2",
+  "第3クォーター": "Q3", "第4クォーター": "Q4",
+  "夏季集中": "SummerIntensive", "冬季集中": "WinterIntensive",
+};
+const REQUIRED_TYPE_MAP: Record<string, string> = {
+  "必修": "Required", "選択": "Optional", "必修選択": "OptionalRequired",
+};
+const CATEGORY_MAP: Record<string, string> = {
+  "専門": "Specialized", "教養": "Cultural", "研究指導": "ResearchInstruction",
+};
+const COURSE_MAP: Record<string, string> = {
+  "情報システム/情報アーキテクチャ": "InformationSystem",
+  "情報デザイン/メディアデザイン": "InformationDesign",
+  "複雑系/複雑系情報学科": "ComplexSystem",
+  "知能システム/知能情報学科": "IntelligentSystem",
+  "高度ICT": "AdvancedICT",
+};
+const GRADE_MAP: Record<string, string> = {
+  "学部1年": "B1", "学部２年": "B2", "学部3年": "B3", "学部4年": "B4",
+  "修士１": "M1", "修士２": "M2",
+};
+
+type Subject = components["schemas"]["SubjectSummary"];
 
 function toggle(set: Set<string>, value: string): Set<string> {
   const next = new Set(set);
@@ -102,6 +123,67 @@ export default function SubjectsSearchView() {
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [selectedGrades, setSelectedGrades] = useState<Set<string>>(new Set());
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const hasCondition =
+    query.length > 0 ||
+    selectedTerms.size > 0 ||
+    selectedRequiredTypes.size > 0 ||
+    selectedCategories.size > 0 ||
+    selectedCourses.size > 0 ||
+    selectedGrades.size > 0 ||
+    selectedClasses.size > 0;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const mapSet = (set: Set<string>, map: Record<string, string>) => {
+      const result = [...set].map((v) => map[v]).filter(Boolean);
+      return result.length > 0 ? result : undefined;
+    };
+
+    if (!hasCondition) {
+      setSubjects([]);
+      setHasError(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      setHasError(false);
+      try {
+        const { data, error } = await api.GET("/v1/subjects", {
+          params: {
+            query: {
+              q: query || undefined,
+              semesters: mapSet(selectedTerms, TERM_MAP) as never,
+              requirementTypes: mapSet(selectedRequiredTypes, REQUIRED_TYPE_MAP) as never,
+              classifications: mapSet(selectedCategories, CATEGORY_MAP) as never,
+              courses: mapSet(selectedCourses, COURSE_MAP) as never,
+              grades: mapSet(selectedGrades, GRADE_MAP) as never,
+              classes: selectedClasses.size > 0 ? ([...selectedClasses] as never) : undefined,
+            },
+          },
+          signal: controller.signal,
+        });
+        if (error || !data) {
+          setHasError(true);
+        } else {
+          setSubjects(data.subjects);
+        }
+      } catch {
+        // abort によるキャンセルは無視する
+      } finally {
+        setIsLoading(false);
+      }
+    }, query ? 300 : 0);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query, selectedTerms, selectedRequiredTypes, selectedCategories, selectedCourses, selectedGrades, selectedClasses]);
 
   return (
     <div className="space-y-4">
@@ -161,20 +243,46 @@ export default function SubjectsSearchView() {
       </FilterSection>
 
       {/* 検索結果 */}
-      <ul className="divide-y divide-border-primary">
-        {MOCK_SUBJECTS.map((subject) => (
-          <li key={subject.id}>
-            <button className="w-full flex items-center justify-between py-4 text-left hover:bg-background-primary transition-colors -mx-2 px-2 rounded-lg">
-              <div className="min-w-0">
-                <p className="font-medium text-label-primary">{subject.title}</p>
-                <p className="text-sm text-label-secondary mt-0.5">{subject.timeCredits}</p>
-                <p className="text-sm text-label-secondary">{subject.teacher}</p>
-              </div>
-              <ChevronRightIcon className="w-4 h-4 text-label-secondary shrink-0 ml-2" />
-            </button>
-          </li>
-        ))}
-      </ul>
+      {isLoading ? (
+        <ul className="divide-y divide-border-primary">
+          {[...Array(3)].map((_, i) => (
+            <li key={i} className="py-4 space-y-2">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-3 w-32" />
+            </li>
+          ))}
+        </ul>
+      ) : hasError ? (
+        <p className="py-8 text-center text-sm text-accent-error">
+          情報の取得に失敗しました。
+        </p>
+      ) : (
+        <ul className="divide-y divide-border-primary">
+          {subjects.length === 0 ? (
+            <li className="py-8 text-center text-sm text-label-secondary">
+              {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
+            </li>
+          ) : (
+            subjects.map((subject) => {
+              const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
+              return (
+                <li key={subject.id}>
+                  <button className="w-full flex items-center justify-between py-4 text-left hover:bg-background-primary transition-colors -mx-2 px-2 rounded-lg">
+                    <div className="min-w-0">
+                      <p className="font-medium text-label-primary">{subject.name}</p>
+                      <p className="text-sm text-label-secondary mt-0.5">{subject.credit}単位</p>
+                      {primaryFaculty && (
+                        <p className="text-sm text-label-secondary">{primaryFaculty.name}</p>
+                      )}
+                    </div>
+                    <ChevronRightIcon className="w-4 h-4 text-label-secondary shrink-0 ml-2" />
+                  </button>
+                </li>
+              );
+            })
+          )}
+        </ul>
+      )}
     </div>
   );
 }

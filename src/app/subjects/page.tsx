@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SubjectsSearchView from "@/components/subjects/SubjectsSearchView";
+import SubjectsSearchView from "@/app/subjects/SubjectsSearchView";
 
 export const metadata: Metadata = {
   title: "科目検索",
