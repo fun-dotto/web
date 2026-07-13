@@ -29,6 +29,7 @@
   --color-border-primary: var(--border-primary);
   --color-accent-info: var(--accent-info);
   --color-accent-error: var(--accent-error);
+  --color-accent-brand: var(--accent-brand);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -95,6 +96,7 @@
   --border-primary: #E3E3E3;
   --accent-info: #0089F0;
   --accent-error: #F51F1F;
+  --accent-brand: #990000;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
