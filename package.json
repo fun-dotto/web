@@ -33,7 +33,7 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@typescript/native": "npm:typescript@7.0.2",
-    "eslint": "10.6.0",
+    "eslint": "9.39.4",
     "eslint-config-next": "16.2.10",
     "openapi-typescript": "7.13.0",
     "tailwindcss": "4.3.2",
