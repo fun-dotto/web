@@ -144,8 +144,6 @@ export default function SubjectsSearchView() {
     };
 
     if (!hasCondition) {
-      setSubjects([]);
-      setHasError(false);
       return;
     }
 
@@ -183,7 +181,9 @@ export default function SubjectsSearchView() {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, selectedTerms, selectedRequiredTypes, selectedCategories, selectedCourses, selectedGrades, selectedClasses]);
+  }, [query, selectedTerms, selectedRequiredTypes, selectedCategories, selectedCourses, selectedGrades, selectedClasses, hasCondition]);
+
+  const displaySubjects = hasCondition ? subjects : [];
 
   return (
     <div className="space-y-4">
@@ -258,12 +258,12 @@ export default function SubjectsSearchView() {
         </p>
       ) : (
         <ul className="divide-y divide-border-primary">
-          {subjects.length === 0 ? (
+          {displaySubjects.length === 0 ? (
             <li className="py-8 text-center text-sm text-label-secondary">
               {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
             </li>
           ) : (
-            subjects.map((subject) => {
+            displaySubjects.map((subject) => {
               const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
               return (
                 <li key={subject.id}>
