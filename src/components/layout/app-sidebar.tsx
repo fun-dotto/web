@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BellIcon, BookOpenIcon, HomeIcon, MonitorIcon } from "lucide-react";
+import { BellIcon, BookOpenIcon, HomeIcon, MonitorIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +28,7 @@ const navItems = [
     icon: BookOpenIcon,
   },
   { title: "Mac サポート", href: "/mac", icon: MonitorIcon },
+  {title:"科目検索", href:"/subjects", icon: SearchIcon},
 ];
 
 export function AppSidebar() {
