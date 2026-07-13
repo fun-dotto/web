@@ -68,6 +68,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    environment: ${{ needs.set-env.outputs.environment }}
     env:
       DOTTO_ENV: ${{ needs.set-env.outputs.environment }}
       SERVICE_NAME: ${{ needs.set-env.outputs.service_name }}
@@ -92,7 +93,8 @@ jobs:
           --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }} \
           --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }} \
           --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }} \
-          --build-arg NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY }}
+          --build-arg NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY }} \
+          --build-arg NEXT_PUBLIC_API_BASE_URL=${{ vars.NEXT_PUBLIC_API_BASE_URL }}
       - name: Authenticate
         id: auth
         uses: google-github-actions/auth@v3
