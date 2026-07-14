@@ -282,57 +282,6 @@ export default function SubjectsSearchView() {
           )}
         </div>
 
-<<<<<<< HEAD
-      {/* フィルター: コース/領域・学年・クラス */}
-      <FilterSection title="コース/領域・学年・クラス">
-        <FilterGroup
-          label="コース/領域"
-          options={COURSES}
-          selected={selectedCourses}
-          onToggle={(v) => setSelectedCourses(toggle(selectedCourses, v))}
-        />
-        <FilterGroup
-          label="学年"
-          options={GRADES}
-          selected={selectedGrades}
-          onToggle={(v) => setSelectedGrades(toggle(selectedGrades, v))}
-        />
-        <FilterGroup
-          label="クラス"
-          options={CLASSES}
-          selected={selectedClasses}
-          onToggle={(v) => setSelectedClasses(toggle(selectedClasses, v))}
-        />
-      </FilterSection>
-
-      {/* 検索結果 */}
-      {isLoading ? (
-        <ul className="divide-y divide-border-primary">
-          {[...Array(3)].map((_, i) => (
-            <li key={i} className="py-4 space-y-2">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-3 w-32" />
-            </li>
-          ))}
-        </ul>
-      ) : hasError ? (
-        <p className="py-8 text-center text-sm text-accent-error">
-          情報の取得に失敗しました。
-        </p>
-      ) : (
-        <ul className="divide-y divide-border-primary">
-          {displaySubjects.length === 0 ? (
-            <li className="py-8 text-center text-sm text-label-secondary">
-              {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
-            </li>
-          ) : (
-            displaySubjects.map((subject) => {
-              const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
-              return (
-                <li key={subject.id}>
-                  <button className="w-full flex items-center justify-between py-4 text-left hover:bg-background-primary transition-colors -mx-2 px-2 rounded-lg">
-                    <div className="min-w-0">
-=======
         {/* 検索結果 */}
         {isLoading ? (
           <ul>
@@ -350,12 +299,12 @@ export default function SubjectsSearchView() {
           </p>
         ) : (
           <ul>
-            {subjects.length === 0 ? (
+            {displaySubjects.length === 0 ? (
               <li className="py-8 text-center text-sm text-label-secondary">
                 {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
               </li>
             ) : (
-              subjects.map((subject) => {
+              displaySubjects.map((subject) => {
                 const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
                 const otherCount = subject.faculties.length - 1;
                 const facultyLabel = primaryFaculty
@@ -366,7 +315,6 @@ export default function SubjectsSearchView() {
                 return (
                   <li key={subject.id} className="border-b-2 border-border-primary">
                     <div className="w-full flex flex-col gap-0.5 py-4">
->>>>>>> 5240d21 (科目検索画面のUIを修正)
                       <p className="font-medium text-label-primary">{subject.name}</p>
                       <p className="text-sm text-label-secondary">
                         {SEMESTER_LABEL[subject.semester] ?? subject.semester}・{subject.credit}単位
