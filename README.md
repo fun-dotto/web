@@ -13,6 +13,16 @@ mise setup
 pnpm dev
 ```
 
+## Storybook
+
+コンポーネントカタログを `http://localhost:6006` で起動します。
+
+```bash
+pnpm storybook
+```
+
+静的ファイルを生成する場合は `pnpm build-storybook` を実行します。
+
 ## Firebase App Check
 
 このプロジェクトは Firebase App Check（reCAPTCHA v3）を利用します。
