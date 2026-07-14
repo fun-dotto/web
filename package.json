@@ -6,6 +6,8 @@
     "dev": "next dev",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "preview:storybook": "wrangler pages dev storybook-static",
+    "deploy:storybook": "pnpm build-storybook && wrangler pages deploy storybook-static --project-name dotto-web-storybook",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -43,6 +45,7 @@
     "openapi-typescript": "7.13.0",
     "storybook": "10.5.0",
     "tailwindcss": "4.3.2",
-    "typescript": "npm:@typescript/typescript6@6.0.2"
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "wrangler": "4.110.0"
   }
 }
