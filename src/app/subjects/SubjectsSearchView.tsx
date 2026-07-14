@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SearchIcon, ChevronRightIcon } from "lucide-react";
+import { SearchIcon, ChevronUpIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
@@ -38,6 +38,12 @@ const GRADE_MAP: Record<string, string> = {
   "修士１": "M1", "修士２": "M2",
 };
 
+const SEMESTER_LABEL: Record<string, string> = {
+  H1: "前期", H2: "後期", AllYear: "通年",
+  Q1: "第1Q", Q2: "第2Q", Q3: "第3Q", Q4: "第4Q",
+  SummerIntensive: "夏季集中", WinterIntensive: "冬季集中",
+};
+
 type Subject = components["schemas"]["SubjectSummary"];
 
 function toggle(set: Set<string>, value: string): Set<string> {
@@ -59,10 +65,10 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1 text-sm rounded-full border transition-colors whitespace-nowrap ${
+      className={`px-3 py-1 text-sm rounded-lg border-2 transition-colors whitespace-nowrap ${
         selected
-          ? "bg-background-tertiary text-label-tertiary border-background-tertiary"
-          : "bg-background-secondary text-label-primary border-border-primary hover:bg-background-primary"
+          ? "bg-accent-brand text-label-tertiary border-accent-brand"
+          : "bg-background-secondary text-label-secondary border-border-primary hover:border-accent-brand"
       }`}
     >
       {label}
@@ -83,7 +89,7 @@ function FilterGroup({
 }) {
   return (
     <div>
-      <p className="text-xs text-label-secondary mb-2">{label}</p>
+      <p className="text-sm font-medium text-label-secondary mb-2">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
           <FilterChip
@@ -105,12 +111,19 @@ function FilterSection({
   title: string;
   children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(true);
   return (
-    <div className="border border-border-primary rounded-lg overflow-hidden">
-      <div className="px-4 py-3 bg-background-primary border-b border-border-primary">
-        <h2 className="text-sm font-semibold text-label-primary">{title}</h2>
-      </div>
-      <div className="px-4 py-4 space-y-4 bg-background-secondary">{children}</div>
+    <div className="border-b-2 border-border-primary">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-3 text-left"
+      >
+        <span className="text-base font-medium text-label-primary">{title}</span>
+        <ChevronUpIcon
+          className={`w-5 h-5 text-label-secondary transition-transform shrink-0 ${open ? "" : "rotate-180"}`}
+        />
+      </button>
+      {open && <div className="pb-4 space-y-4">{children}</div>}
     </div>
   );
 }
@@ -135,6 +148,16 @@ export default function SubjectsSearchView() {
     selectedCourses.size > 0 ||
     selectedGrades.size > 0 ||
     selectedClasses.size > 0;
+
+  function clearAll() {
+    setQuery("");
+    setSelectedTerms(new Set());
+    setSelectedRequiredTypes(new Set());
+    setSelectedCategories(new Set());
+    setSelectedCourses(new Set());
+    setSelectedGrades(new Set());
+    setSelectedClasses(new Set());
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -186,103 +209,127 @@ export default function SubjectsSearchView() {
   const displaySubjects = hasCondition ? subjects : [];
 
   return (
-    <div className="space-y-4">
-      {/* 検索入力 */}
-      <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-label-secondary pointer-events-none" />
-        <Input
-          placeholder="科目名で検索"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="pl-9"
-        />
+    <div className="flex items-start gap-4">
+      {/* 左カラム: 検索入力 + フィルター */}
+      <div className="w-72 shrink-0 space-y-0">
+        {/* 検索入力 */}
+        <div className="relative border-b-2 border-border-primary py-3">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-label-secondary pointer-events-none" />
+          <Input
+            placeholder="科目名で検索"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pl-9 border-none shadow-none bg-transparent focus-visible:ring-0"
+          />
+        </div>
+
+        {/* フィルター: 開校時期・必修/選択・分類 */}
+        <FilterSection title="開校時期・必修/選択・分類">
+          <FilterGroup
+            label="開講時期"
+            options={TERMS}
+            selected={selectedTerms}
+            onToggle={(v) => setSelectedTerms(toggle(selectedTerms, v))}
+          />
+          <FilterGroup
+            label="必修/選択"
+            options={REQUIRED_TYPES}
+            selected={selectedRequiredTypes}
+            onToggle={(v) => setSelectedRequiredTypes(toggle(selectedRequiredTypes, v))}
+          />
+          <FilterGroup
+            label="分類"
+            options={CATEGORIES}
+            selected={selectedCategories}
+            onToggle={(v) => setSelectedCategories(toggle(selectedCategories, v))}
+          />
+        </FilterSection>
+
+        {/* フィルター: コース/領域・学年・クラス */}
+        <FilterSection title="コース/領域・学年・クラス">
+          <FilterGroup
+            label="コース/領域"
+            options={COURSES}
+            selected={selectedCourses}
+            onToggle={(v) => setSelectedCourses(toggle(selectedCourses, v))}
+          />
+          <FilterGroup
+            label="学年"
+            options={GRADES}
+            selected={selectedGrades}
+            onToggle={(v) => setSelectedGrades(toggle(selectedGrades, v))}
+          />
+          <FilterGroup
+            label="クラス"
+            options={CLASSES}
+            selected={selectedClasses}
+            onToggle={(v) => setSelectedClasses(toggle(selectedClasses, v))}
+          />
+        </FilterSection>
       </div>
 
-      {/* フィルター: 開校時期・必修/選択・分類 */}
-      <FilterSection title="開校時期・必修/選択・分類">
-        <FilterGroup
-          label="開講時期"
-          options={TERMS}
-          selected={selectedTerms}
-          onToggle={(v) => setSelectedTerms(toggle(selectedTerms, v))}
-        />
-        <FilterGroup
-          label="必修/選択"
-          options={REQUIRED_TYPES}
-          selected={selectedRequiredTypes}
-          onToggle={(v) => setSelectedRequiredTypes(toggle(selectedRequiredTypes, v))}
-        />
-        <FilterGroup
-          label="分類"
-          options={CATEGORIES}
-          selected={selectedCategories}
-          onToggle={(v) => setSelectedCategories(toggle(selectedCategories, v))}
-        />
-      </FilterSection>
+      {/* 右カラム: 条件クリア + 検索結果 */}
+      <div className="flex-1 min-w-0">
+        {/* 条件をクリア */}
+        <div className="flex justify-end py-3 border-b-2 border-border-primary">
+          {hasCondition && (
+            <button
+              onClick={clearAll}
+              className="text-sm text-label-secondary hover:text-label-primary transition-colors"
+            >
+              条件をクリア
+            </button>
+          )}
+        </div>
 
-      {/* フィルター: コース/領域・学年・クラス */}
-      <FilterSection title="コース/領域・学年・クラス">
-        <FilterGroup
-          label="コース/領域"
-          options={COURSES}
-          selected={selectedCourses}
-          onToggle={(v) => setSelectedCourses(toggle(selectedCourses, v))}
-        />
-        <FilterGroup
-          label="学年"
-          options={GRADES}
-          selected={selectedGrades}
-          onToggle={(v) => setSelectedGrades(toggle(selectedGrades, v))}
-        />
-        <FilterGroup
-          label="クラス"
-          options={CLASSES}
-          selected={selectedClasses}
-          onToggle={(v) => setSelectedClasses(toggle(selectedClasses, v))}
-        />
-      </FilterSection>
-
-      {/* 検索結果 */}
-      {isLoading ? (
-        <ul className="divide-y divide-border-primary">
-          {[...Array(3)].map((_, i) => (
-            <li key={i} className="py-4 space-y-2">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-3 w-32" />
-            </li>
-          ))}
-        </ul>
-      ) : hasError ? (
-        <p className="py-8 text-center text-sm text-accent-error">
-          情報の取得に失敗しました。
-        </p>
-      ) : (
-        <ul className="divide-y divide-border-primary">
-          {displaySubjects.length === 0 ? (
-            <li className="py-8 text-center text-sm text-label-secondary">
-              {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
-            </li>
-          ) : (
-            displaySubjects.map((subject) => {
-              const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
-              return (
-                <li key={subject.id}>
-                  <button className="w-full flex items-center justify-between py-4 text-left hover:bg-background-primary transition-colors -mx-2 px-2 rounded-lg">
-                    <div className="min-w-0">
+        {/* 検索結果 */}
+        {isLoading ? (
+          <ul>
+            {[...Array(3)].map((_, i) => (
+              <li key={i} className="py-4 space-y-2 border-b-2 border-border-primary">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-40" />
+              </li>
+            ))}
+          </ul>
+        ) : hasError ? (
+          <p className="py-8 text-center text-sm text-accent-error">
+            情報の取得に失敗しました。
+          </p>
+        ) : (
+          <ul>
+            {displaySubjects.length === 0 ? (
+              <li className="py-8 text-center text-sm text-label-secondary">
+                {hasCondition ? "該当する科目が見つかりません" : "検索条件を入力してください"}
+              </li>
+            ) : (
+              displaySubjects.map((subject) => {
+                const primaryFaculty = subject.faculties.find((f) => f.isPrimary)?.faculty;
+                const otherCount = subject.faculties.length - 1;
+                const facultyLabel = primaryFaculty
+                  ? otherCount > 0
+                    ? `${primaryFaculty.name} 他${otherCount}名`
+                    : primaryFaculty.name
+                  : undefined;
+                return (
+                  <li key={subject.id} className="border-b-2 border-border-primary">
+                    <div className="w-full flex flex-col gap-0.5 py-4">
                       <p className="font-medium text-label-primary">{subject.name}</p>
-                      <p className="text-sm text-label-secondary mt-0.5">{subject.credit}単位</p>
-                      {primaryFaculty && (
-                        <p className="text-sm text-label-secondary">{primaryFaculty.name}</p>
+                      <p className="text-sm text-label-secondary">
+                        {SEMESTER_LABEL[subject.semester] ?? subject.semester}・{subject.credit}単位
+                      </p>
+                      {facultyLabel && (
+                        <p className="text-sm text-label-secondary">{facultyLabel}</p>
                       )}
                     </div>
-                    <ChevronRightIcon className="w-4 h-4 text-label-secondary shrink-0 ml-2" />
-                  </button>
-                </li>
-              );
-            })
-          )}
-        </ul>
-      )}
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
