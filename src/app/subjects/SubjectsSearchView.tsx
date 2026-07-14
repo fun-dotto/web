@@ -144,7 +144,7 @@ export default function SubjectsSearchView() {
   const [selectedGrades, setSelectedGrades] = useState<Set<string>>(new Set());
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [slotMap, setSlotMap] = useState<Map<string, string>>(new Map());
+  const [slotMap, setSlotMap] = useState<Map<string, string[]>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -216,12 +216,18 @@ export default function SubjectsSearchView() {
         }
 
         if (timetableRes.data) {
-          const map = new Map<string, string>();
+          const map = new Map<string, string[]>();
           for (const item of timetableRes.data.timetableItems) {
-            if (item.slot && !map.has(item.subject.id)) {
+            if (item.slot) {
               const day = DAY_MAP[item.slot.dayOfWeek] ?? "";
               const period = item.slot.period.replace("Period", "");
-              map.set(item.subject.id, `${day}${period}`);
+              const label = `${day}${period}`;
+              const existing = map.get(item.subject.id);
+              if (existing) {
+                existing.push(label);
+              } else {
+                map.set(item.subject.id, [label]);
+              }
             }
           }
           setSlotMap(map);
@@ -352,7 +358,7 @@ export default function SubjectsSearchView() {
                       <p className="text-sm leading-[1.2] text-label-secondary">
                         {[
                           SEMESTER_LABEL[subject.semester] ?? subject.semester,
-                          slotMap.get(subject.id),
+                          slotMap.get(subject.id)?.join(","),
                           `${subject.credit}単位`,
                         ].filter(Boolean).join(" ")}
                       </p>
