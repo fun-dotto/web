@@ -4,16 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "preview:storybook": "wrangler pages dev storybook-static",
-    "deploy:storybook": "pnpm build-storybook && wrangler pages deploy storybook-static --project-name dotto-web-storybook",
+    "generate:api": "openapi-typescript openapi/openapi.yaml -o src/types/api.d.ts",
+    "build:aasa": "node scripts/build-aasa.mjs",
+    "prebuild": "pnpm generate:api && pnpm build:aasa",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:api": "openapi-typescript openapi/openapi.yaml -o src/types/api.d.ts",
-    "build:aasa": "node scripts/build-aasa.mjs",
-    "prebuild": "pnpm generate:api && pnpm build:aasa"
+    "storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build",
+    "preview:storybook": "wrangler pages dev storybook-static",
+    "deploy:storybook": "pnpm build:storybook && wrangler pages deploy storybook-static --project-name dotto-web-storybook"
   },
   "dependencies": {
     "@base-ui/react": "1.6.0",

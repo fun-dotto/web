@@ -21,7 +21,7 @@ pnpm dev
 pnpm storybook
 ```
 
-静的ファイルを生成する場合は `pnpm build-storybook` を実行します。
+静的ファイルを生成する場合は `pnpm build:storybook` を実行します。
 
 ### Cloudflare Pages
 
@@ -29,7 +29,7 @@ Git連携でPagesプロジェクトを作成するときは、次のビルド設
 
 - プロジェクト名: `dotto-web-storybook`
 - Production branch: `main`
-- Build command: `pnpm build-storybook`
+- Build command: `pnpm build:storybook`
 - Build output directory: `storybook-static`
 - Root directory: `/`
 - Environment variable: `PNPM_VERSION=11.10.0`
@@ -37,7 +37,7 @@ Git連携でPagesプロジェクトを作成するときは、次のビルド設
 静的ビルドをCloudflareのローカルサーバーで確認する場合:
 
 ```bash
-pnpm build-storybook
+pnpm build:storybook
 pnpm preview:storybook
 ```
 
