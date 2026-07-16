@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SearchIcon, ChevronUpIcon } from "lucide-react";
+import { ListItem } from "@/components/dotto/list-item";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
@@ -351,7 +352,13 @@ export default function SubjectsSearchView() {
                     ? `${primaryFaculty.name} 他${otherCount}名`
                     : primaryFaculty.name
                   : undefined;
+                const infoLabel = [
+                  SEMESTER_LABEL[subject.semester] ?? subject.semester,
+                  slotMap.get(subject.id)?.join(","),
+                  `${subject.credit}単位`,
+                ].filter(Boolean).join(" ");
                 return (
+<<<<<<< HEAD
                   <li key={subject.id} className="border-b-2 border-border-primary">
                     <div className="w-full flex flex-col gap-0.5 py-4">
                       <p className="font-medium text-label-primary">{subject.name}</p>
@@ -366,6 +373,13 @@ export default function SubjectsSearchView() {
                         <p className="text-sm text-label-secondary">{facultyLabel}</p>
                       )}
                     </div>
+=======
+                  <li key={subject.id}>
+                    <ListItem
+                      title={subject.name}
+                      descriptions={[infoLabel, facultyLabel].filter(Boolean) as string[]}
+                    />
+>>>>>>> 15bc743 (科目検索結果の表示にListItemコンポーネントを使用する)
                   </li>
                 );
               })
