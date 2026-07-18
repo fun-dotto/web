@@ -44,6 +44,13 @@ const SEMESTER_LABEL: Record<string, string> = {
   SummerIntensive: "夏季集中", WinterIntensive: "冬季集中",
 };
 
+const DAY_MAP: Record<string, string> = {
+  Monday: "月", Tuesday: "火", Wednesday: "水",
+  Thursday: "木", Friday: "金", Saturday: "土", Sunday: "日",
+};
+
+const ALL_SEMESTERS = Object.values(TERM_MAP);
+
 type Subject = components["schemas"]["SubjectSummary"];
 
 function toggle(set: Set<string>, value: string): Set<string> {
@@ -137,6 +144,7 @@ export default function SubjectsSearchView() {
   const [selectedGrades, setSelectedGrades] = useState<Set<string>>(new Set());
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [slotMap, setSlotMap] = useState<Map<string, string[]>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -174,24 +182,55 @@ export default function SubjectsSearchView() {
       setIsLoading(true);
       setHasError(false);
       try {
-        const { data, error } = await api.GET("/v1/subjects", {
-          params: {
-            query: {
-              q: query || undefined,
-              semesters: mapSet(selectedTerms, TERM_MAP) as never,
-              requirementTypes: mapSet(selectedRequiredTypes, REQUIRED_TYPE_MAP) as never,
-              classifications: mapSet(selectedCategories, CATEGORY_MAP) as never,
-              courses: mapSet(selectedCourses, COURSE_MAP) as never,
-              grades: mapSet(selectedGrades, GRADE_MAP) as never,
-              classes: selectedClasses.size > 0 ? ([...selectedClasses] as never) : undefined,
+        const semesters = selectedTerms.size > 0
+          ? mapSet(selectedTerms, TERM_MAP)!
+          : ALL_SEMESTERS;
+
+        const [subjectsRes, timetableRes] = await Promise.all([
+          api.GET("/v1/subjects", {
+            params: {
+              query: {
+                q: query || undefined,
+                semesters: mapSet(selectedTerms, TERM_MAP) as never,
+                requirementTypes: mapSet(selectedRequiredTypes, REQUIRED_TYPE_MAP) as never,
+                classifications: mapSet(selectedCategories, CATEGORY_MAP) as never,
+                courses: mapSet(selectedCourses, COURSE_MAP) as never,
+                grades: mapSet(selectedGrades, GRADE_MAP) as never,
+                classes: selectedClasses.size > 0 ? ([...selectedClasses] as never) : undefined,
+              },
             },
-          },
-          signal: controller.signal,
-        });
-        if (error || !data) {
+            signal: controller.signal,
+          }),
+          api.GET("/v1/timetableItems", {
+            params: {
+              query: { semesters: semesters as never },
+            },
+            signal: controller.signal,
+          }),
+        ]);
+
+        if (subjectsRes.error || !subjectsRes.data) {
           setHasError(true);
         } else {
-          setSubjects(data.subjects);
+          setSubjects(subjectsRes.data.subjects);
+        }
+
+        if (timetableRes.data) {
+          const map = new Map<string, string[]>();
+          for (const item of timetableRes.data.timetableItems) {
+            if (item.slot) {
+              const day = DAY_MAP[item.slot.dayOfWeek] ?? "";
+              const period = item.slot.period.replace("Period", "");
+              const label = `${day}${period}`;
+              const existing = map.get(item.subject.id);
+              if (existing) {
+                existing.push(label);
+              } else {
+                map.set(item.subject.id, [label]);
+              }
+            }
+          }
+          setSlotMap(map);
         }
       } catch {
         // abort によるキャンセルは無視する
@@ -316,8 +355,12 @@ export default function SubjectsSearchView() {
                   <li key={subject.id} className="border-b-2 border-border-primary">
                     <div className="w-full flex flex-col gap-0.5 py-4">
                       <p className="font-medium text-label-primary">{subject.name}</p>
-                      <p className="text-sm text-label-secondary">
-                        {SEMESTER_LABEL[subject.semester] ?? subject.semester}・{subject.credit}単位
+                      <p className="text-sm leading-[1.2] text-label-secondary">
+                        {[
+                          SEMESTER_LABEL[subject.semester] ?? subject.semester,
+                          slotMap.get(subject.id)?.join(","),
+                          `${subject.credit}単位`,
+                        ].filter(Boolean).join(" ")}
                       </p>
                       {facultyLabel && (
                         <p className="text-sm text-label-secondary">{facultyLabel}</p>
