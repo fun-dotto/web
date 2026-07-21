@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SearchIcon, ChevronUpIcon } from "lucide-react";
 import { ListItem } from "@/components/dotto/list-item";
 import { Input } from "@/components/ui/input";
@@ -137,6 +138,7 @@ function FilterSection({
 }
 
 export default function SubjectsSearchView() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
   const [selectedRequiredTypes, setSelectedRequiredTypes] = useState<Set<string>>(new Set());
@@ -362,6 +364,7 @@ export default function SubjectsSearchView() {
                     <ListItem
                       title={subject.name}
                       descriptions={[infoLabel, facultyLabel].filter(Boolean) as string[]}
+                      onClick={() => router.push(`/subjects/${subject.id}`)}
                     />
                   </li>
                 );
