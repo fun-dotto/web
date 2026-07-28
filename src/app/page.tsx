@@ -1,5 +1,5 @@
-export default function Home() {
-  return (
-    <></>
-  );
+import { redirect, RedirectType } from "next/navigation";
+
+export default function Page() {
+  redirect("/course", RedirectType.replace);
 }

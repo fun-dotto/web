@@ -1,14 +1,33 @@
 {
   "applinks": {
-    "apps": [],
     "details": [
       {
-        "appID": "64LEQXTB98.jp.ac.fun.dotto",
-        "paths":[ "*" ]
-      },
-      {
-        "appID": "64LEQXTB98.jp.ac.fun.dotto.prd",
-        "paths":[ "*" ]
+        "appIDs": [
+          "64LEQXTB98.jp.ac.fun.dotto",
+          "64LEQXTB98.jp.ac.fun.dotto.prd"
+        ],
+        "components": [
+          {
+            "#": "no_universal_links",
+            "exclude": true,
+            "comment": "Matches any URL with a fragment that equals no_universal_links and instructs the system not to open it as a universal link."
+          },
+          {
+            "/": "/course/*"
+          },
+          {
+            "/": "/funch/*"
+          },
+          {
+            "/": "/map/*"
+          },
+          {
+            "/": "/bus/*"
+          },
+          {
+            "/": "/setting/*"
+          }
+        }
       }
     ]
   },

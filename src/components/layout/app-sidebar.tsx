@@ -13,22 +13,34 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BellIcon, BookOpenIcon, HomeIcon, MonitorIcon, SearchIcon } from "lucide-react";
+import { BellIcon, BookOpenIcon, MonitorIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import DottoIcon from "@/assets/icon1024.png";
 
-const navItems = [
-  { title: "ホーム", href: "/", icon: HomeIcon },
-  { title: "お知らせ", href: "/announcements", icon: BellIcon },
+const navSections = [
   {
-    title: "休講・補講・教室変更",
-    href: "/class-changes",
-    icon: BookOpenIcon,
+    label: "講義",
+    items: [
+      { title: "科目検索", href: "/course/subjects", icon: SearchIcon },
+      {
+        title: "休講・補講・教室変更",
+        href: "/course/notice",
+        icon: BookOpenIcon,
+      },
+    ],
   },
-  { title: "Mac サポート", href: "/mac", icon: MonitorIcon },
-  {title:"科目検索", href:"/subjects", icon: SearchIcon},
+  {
+    label: "設定",
+    items: [
+      { title: "お知らせ", href: "/setting/announcements", icon: BellIcon },
+    ],
+  },
+  {
+    label: "その他",
+    items: [{ title: "Mac サポート", href: "/mac", icon: MonitorIcon }],
+  },
 ];
 
 export function AppSidebar() {
@@ -40,7 +52,7 @@ export function AppSidebar() {
       <SidebarHeader className="px-4 py-4">
         <div className="flex items-center gap-2">
           <Image
-            src={ DottoIcon }
+            src={DottoIcon}
             alt="Dotto"
             width={28}
             height={28}
@@ -51,24 +63,26 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>メニュー</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    render={<Link href={item.href} />}
-                    isActive={pathname === item.href}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navSections.map((section) => (
+          <SidebarGroup key={section.label}>
+            <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      render={<Link href={item.href} />}
+                      isActive={pathname === item.href}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter className="px-4 py-4">
