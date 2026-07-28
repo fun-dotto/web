@@ -19,12 +19,18 @@ function DetailSection({ label, value }: DetailRow) {
   return (
     <div className="border-b-2 border-border-primary py-3 flex flex-col gap-2">
       <p className="font-medium text-xl text-label-primary">{label}</p>
-      <p className="text-base text-label-secondary leading-normal tracking-[0.48px] whitespace-pre-wrap">{value}</p>
+      <p className="text-base text-label-secondary leading-normal tracking-[0.48px] whitespace-pre-wrap">
+        {value}
+      </p>
     </div>
   );
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   const { data, error } = await api.GET("/v1/subjects/{id}", {
@@ -66,7 +72,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     <div>
       {/* ヘッダー */}
       <div className="flex items-center gap-4 py-3 border-b-2 border-border-primary">
-        <Link href="/subjects" className="text-label-secondary hover:text-label-primary transition-colors">
+        <Link
+          href="/course/subjects"
+          className="text-label-secondary hover:text-label-primary transition-colors"
+        >
           <ChevronLeftIcon className="w-6 h-6" />
         </Link>
         <h1 className="text-xl font-medium text-accent-brand">{name}</h1>
@@ -76,7 +85,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <div className="flex justify-center p-[10px]">
         <div className="flex-1 max-w-[836px]">
           {rows.map((row) => (
-            <DetailSection key={row.label} label={row.label} value={row.value} />
+            <DetailSection
+              key={row.label}
+              label={row.label}
+              value={row.value}
+            />
           ))}
         </div>
       </div>
