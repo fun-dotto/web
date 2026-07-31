@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ChevronLeftIcon } from "lucide-react";
 import { api } from "@/lib/api";
 
@@ -33,9 +34,11 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  const { data, error } = await api.GET("/v1/subjects/{id}", {
+  const { data, error, response } = await api.GET("/v1/subjects/{id}", {
     params: { path: { id } },
   });
+
+  if (response.status === 404) notFound();
 
   if (error || !data) {
     return (
