@@ -71,7 +71,7 @@ export default async function MacPage() {
           <p className="text-label-secondary text-sm">ページがありません</p>
         </div>
       ) : (
-        <ul className="max-w-xl mx-auto">
+        <ul className="max-w-3xl mx-auto">
           {pages.map((page) => {
             const title = getTitle(page);
             const tags = getTags(page);

@@ -58,7 +58,7 @@ export default async function Page() {
           <p className="text-label-secondary text-sm">お知らせはありません</p>
         </div>
       ) : (
-        <ul className="max-w-xl mx-auto">
+        <ul className="max-w-3xl mx-auto">
           {data.announcements.map((announcement) => {
             const { year, month, day } = formatDate(announcement.date);
             const relative = relativeLabel(announcement.date, new Date());
