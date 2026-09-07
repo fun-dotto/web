@@ -86,7 +86,7 @@ export default async function Page({
 
       {/* 詳細リスト */}
       <div className="flex justify-center p-[10px]">
-        <div className="flex-1 max-w-[836px]">
+        <div className="flex-1 max-w-3xl">
           {rows.map((row) => (
             <DetailSection
               key={row.label}

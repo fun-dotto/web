@@ -370,7 +370,7 @@ export default function SubjectsSearchView({
   const displaySubjects = hasCondition || hasSearched ? subjects : [];
 
   return (
-    <div className="flex flex-col @[768px]:flex-row items-stretch @[768px]:items-start gap-4 h-[calc(100svh-6rem)] min-h-0">
+    <div className="flex flex-col @[768px]:flex-row items-stretch @[768px]:items-start gap-4 h-[calc(100svh-6rem)] min-h-0 max-w-5xl mx-auto">
       {(hasCondition || hasSearched) && (
         <PageHeaderActions>
           <button
