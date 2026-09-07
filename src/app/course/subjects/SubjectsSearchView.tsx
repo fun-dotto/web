@@ -16,6 +16,7 @@ import {
 import { fetchSubjectsAndSlots } from "./fetch-subjects";
 import { FilterGroup, FilterSection } from "./filter-controls";
 import { SubjectResultsList } from "./subject-results-list";
+import { PageHeaderActions } from "@/contexts/page-header-context";
 
 export default function SubjectsSearchView() {
   const [query, setQuery] = useState("");
@@ -115,6 +116,16 @@ export default function SubjectsSearchView() {
 
   return (
     <div className="flex items-start gap-4">
+      {hasCondition && (
+        <PageHeaderActions>
+          <button
+            onClick={clearAll}
+            className="text-sm text-label-secondary hover:text-label-primary transition-colors"
+          >
+            条件をクリア
+          </button>
+        </PageHeaderActions>
+      )}
       {/* 左カラム: 検索入力 + フィルター */}
       <div className="w-72 shrink-0 space-y-0">
         {/* 検索入力 */}
@@ -177,20 +188,8 @@ export default function SubjectsSearchView() {
         </FilterSection>
       </div>
 
-      {/* 右カラム: 条件クリア + 検索結果 */}
+      {/* 右カラム: 検索結果 */}
       <div className="flex-1 min-w-0">
-        {/* 条件をクリア */}
-        <div className="flex justify-end py-3 border-b-2 border-border-primary">
-          {hasCondition && (
-            <button
-              onClick={clearAll}
-              className="text-sm text-label-secondary hover:text-label-primary transition-colors"
-            >
-              条件をクリア
-            </button>
-          )}
-        </div>
-
         {/* 検索結果 */}
         <SubjectResultsList
           isLoading={isLoading}
