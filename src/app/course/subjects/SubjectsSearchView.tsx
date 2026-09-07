@@ -73,7 +73,10 @@ export default function SubjectsSearchView() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const skipNextFetch = useRef(restored !== null);
+  const pendingAbort = useRef<AbortController | null>(null);
+  const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hasCondition =
     query.length > 0 ||
@@ -94,9 +97,50 @@ export default function SubjectsSearchView() {
     setSelectedClasses(new Set());
     setSubjects([]);
     setSlotMap(new Map());
+    setHasSearched(false);
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
+  }
+
+  async function runSearch(signal: AbortSignal) {
+    setIsLoading(true);
+    setHasError(false);
+    try {
+      const result = await fetchSubjectsAndSlots(
+        {
+          query,
+          selectedTerms,
+          selectedRequiredTypes,
+          selectedCategories,
+          selectedCourses,
+          selectedGrades,
+          selectedClasses,
+        },
+        signal,
+      );
+      if (result.hasError) {
+        setHasError(true);
+      } else {
+        setSubjects(result.subjects);
+        setSlotMap(new Map(result.slotEntries));
+      }
+    } catch {
+      // abort によるキャンセルは無視する
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    pendingAbort.current?.abort();
+    skipNextFetch.current = false;
+    setHasSearched(true);
+    const controller = new AbortController();
+    pendingAbort.current = controller;
+    void runSearch(controller.signal);
   }
 
   useEffect(() => {
@@ -110,38 +154,15 @@ export default function SubjectsSearchView() {
     }
 
     const controller = new AbortController();
+    pendingAbort.current = controller;
 
     const timer = setTimeout(
-      async () => {
-        setIsLoading(true);
-        setHasError(false);
-        try {
-          const result = await fetchSubjectsAndSlots(
-            {
-              query,
-              selectedTerms,
-              selectedRequiredTypes,
-              selectedCategories,
-              selectedCourses,
-              selectedGrades,
-              selectedClasses,
-            },
-            controller.signal,
-          );
-          if (result.hasError) {
-            setHasError(true);
-          } else {
-            setSubjects(result.subjects);
-            setSlotMap(new Map(result.slotEntries));
-          }
-        } catch {
-          // abort によるキャンセルは無視する
-        } finally {
-          setIsLoading(false);
-        }
+      () => {
+        void runSearch(controller.signal);
       },
       query ? 300 : 0,
     );
+    pendingTimer.current = timer;
 
     return () => {
       clearTimeout(timer);
@@ -189,11 +210,11 @@ export default function SubjectsSearchView() {
     hasCondition,
   ]);
 
-  const displaySubjects = hasCondition ? subjects : [];
+  const displaySubjects = hasCondition || hasSearched ? subjects : [];
 
   return (
     <div className="flex flex-col @[768px]:flex-row items-stretch @[768px]:items-start gap-4 h-[calc(100svh-6rem)] min-h-0">
-      {hasCondition && (
+      {(hasCondition || hasSearched) && (
         <PageHeaderActions>
           <button
             onClick={clearAll}
@@ -206,7 +227,7 @@ export default function SubjectsSearchView() {
       {/* 左カラム: 検索入力 + フィルター */}
       <div className="w-full @[768px]:w-72 shrink-0 space-y-0">
         {/* 検索入力 */}
-        <div className="relative py-3">
+        <form onSubmit={handleSubmit} className="relative py-3">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-label-secondary pointer-events-none" />
           <Input
             placeholder="科目名で検索"
@@ -214,7 +235,7 @@ export default function SubjectsSearchView() {
             onChange={(e) => setQuery(e.target.value)}
             className="pl-9 border border-border-primary shadow-none bg-background-secondary focus-visible:ring-0"
           />
-        </div>
+        </form>
 
         {/* フィルター: 開校時期・必修/選択・分類 */}
         <FilterSection title="開校時期・必修/選択・分類">
@@ -271,7 +292,7 @@ export default function SubjectsSearchView() {
         <SubjectResultsList
           isLoading={isLoading}
           hasError={hasError}
-          hasCondition={hasCondition}
+          hasCondition={hasCondition || hasSearched}
           subjects={displaySubjects}
           slotMap={slotMap}
         />
