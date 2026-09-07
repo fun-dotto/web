@@ -13,35 +13,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BellIcon, BookOpenIcon, MonitorIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import DottoIcon from "@/assets/icon1024.png";
-
-const navSections = [
-  {
-    label: "講義",
-    items: [
-      { title: "科目検索", href: "/course/subjects", icon: SearchIcon },
-      {
-        title: "休講・補講・教室変更",
-        href: "/course/notice",
-        icon: BookOpenIcon,
-      },
-    ],
-  },
-  {
-    label: "設定",
-    items: [
-      { title: "お知らせ", href: "/setting/announcements", icon: BellIcon },
-    ],
-  },
-  {
-    label: "その他",
-    items: [{ title: "Mac サポート", href: "/mac", icon: MonitorIcon }],
-  },
-];
+import { navSections } from "@/components/layout/nav-sections";
 
 export function AppSidebar() {
   const { user, signOutUser } = useAuth();

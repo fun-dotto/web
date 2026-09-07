@@ -2,9 +2,30 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { pageTitleForPathname } from "@/components/layout/nav-sections";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  PageHeaderTitleProvider,
+  usePageHeaderTitle,
+} from "@/contexts/page-header-context";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+
+function PageHeader({ pathname }: { pathname: string }) {
+  const overrideTitle = usePageHeaderTitle();
+  const pageTitle = overrideTitle ?? pageTitleForPathname(pathname);
+
+  return (
+    <header className="flex h-12 items-center gap-3 px-4 border-b border-border-primary">
+      <SidebarTrigger />
+      {pageTitle && (
+        <h1 className="text-sm font-semibold text-label-primary">
+          {pageTitle}
+        </h1>
+      )}
+    </header>
+  );
+}
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -35,13 +56,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-12 items-center px-4 border-b border-border-primary">
-          <SidebarTrigger />
-        </header>
-        <main className="flex-1 p-6 bg-background-primary">{children}</main>
-      </SidebarInset>
+      <PageHeaderTitleProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <PageHeader pathname={pathname} />
+          <main className="flex-1 p-6 bg-background-primary">{children}</main>
+        </SidebarInset>
+      </PageHeaderTitleProvider>
     </SidebarProvider>
   );
 }
