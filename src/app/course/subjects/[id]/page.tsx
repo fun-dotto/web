@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeftIcon } from "lucide-react";
 import { api } from "@/lib/api";
+import { PageHeaderTitle } from "@/contexts/page-header-context";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "科目詳細",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const { data } = await api.GET("/v1/subjects/{id}", {
+    params: { path: { id } },
+  });
+
+  return { title: data?.subject.name ?? "科目詳細" };
+}
 
 type DetailRow = {
   label: string;
@@ -73,16 +82,7 @@ export default async function Page({
 
   return (
     <div>
-      {/* ヘッダー */}
-      <div className="flex items-center gap-4 py-3 border-b-2 border-border-primary">
-        <Link
-          href="/course/subjects"
-          className="text-label-secondary hover:text-label-primary transition-colors"
-        >
-          <ChevronLeftIcon className="w-6 h-6" />
-        </Link>
-        <h1 className="text-xl font-medium text-accent-brand">{name}</h1>
-      </div>
+      <PageHeaderTitle title={name} />
 
       {/* 詳細リスト */}
       <div className="flex justify-center p-[10px]">
