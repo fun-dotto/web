@@ -1,5 +1,4 @@
 import { ListItem } from "@/components/dotto/list-item";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { SEMESTER_LABEL, type Subject } from "./constants";
 
@@ -19,11 +18,14 @@ export function SubjectResultsList({
   if (isLoading) {
     return (
       <ul>
-        {[...Array(3)].map((_, i) => (
-          <li key={i} className="py-4 space-y-2 border-b-2 border-border-primary">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-3 w-40" />
+        {[...Array(10)].map((_, i) => (
+          <li key={i}>
+            <ListItem
+              isLoading
+              title=""
+              description1=" "
+              description2=" "
+            />
           </li>
         ))}
       </ul>
