@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ListItem } from "./list-item";
+import { Plus, User } from "lucide-react";
 
 const meta = {
   title: "Dotto/ListItem",
@@ -13,7 +14,11 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    title: "情報工学概論",
+    title: "認知科学1〜4",
+    description1: "前期 木5　2単位",
+    description2: "花田 光彦 他9名",
+    value: "シラバスを見る",
+    leadingIcon: Plus,
   },
   render: (args) => (
     <div className="w-96">
@@ -22,10 +27,14 @@ export const Default: Story = {
   ),
 };
 
-export const WithDescriptions: Story = {
+export const WithoutValue: Story = {
   args: {
-    title: "情報工学概論",
-    descriptions: ["月曜1限", "工学部棟 101教室"],
+    title: "認知科学1〜4",
+    description1: "前期 木5　2単位",
+    description2: "花田 光彦 他9名",
+    leadingIcon: Plus,
+    onTapped: () => alert("タップされました"),
+    onLeadingIconTapped: () => alert("アイコンがタップされました"),
   },
   render: (args) => (
     <div className="w-96">
@@ -34,11 +43,12 @@ export const WithDescriptions: Story = {
   ),
 };
 
-export const Clickable: Story = {
+export const WithValue: Story = {
   args: {
-    title: "情報工学概論",
-    descriptions: ["月曜1限"],
-    onClick: () => alert("クリックされました"),
+    title: "学年",
+    value: "学部1年",
+    leadingIcon: User,
+    onTapped: () => alert("タップされました"),
   },
   render: (args) => (
     <div className="w-96">

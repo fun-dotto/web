@@ -455,10 +455,9 @@ export default function SubjectsSearchView() {
                   <li key={subject.id}>
                     <ListItem
                       title={subject.name}
-                      descriptions={
-                        [infoLabel, facultyLabel].filter(Boolean) as string[]
-                      }
-                      onClick={() =>
+                      description1={infoLabel}
+                      description2={facultyLabel}
+                      onTapped={() =>
                         router.push(`/course/subjects/${subject.id}`)
                       }
                     />
