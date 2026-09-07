@@ -64,21 +64,6 @@ export default async function MacPage() {
 
   return (
     <div>
-      {/* Hero Header */}
-      <div className="bg-background-tertiary -mx-6 -mt-6 px-6 pt-10 pb-8 mb-8">
-        <p className="text-xs font-medium tracking-[0.25em] uppercase mb-3 text-label-tertiary/50">
-          Support / Mac
-        </p>
-        <div className="flex items-end justify-between">
-          <h1 className="text-5xl font-bold tracking-tight text-label-tertiary leading-none">
-            Mac サポート
-          </h1>
-          <p className="text-sm text-label-tertiary/40 pb-1 tabular-nums">
-            {pages.length} 件
-          </p>
-        </div>
-      </div>
-
       {/* Article List */}
       {pages.length === 0 ? (
         <div className="py-20 text-center">

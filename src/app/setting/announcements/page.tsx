@@ -45,23 +45,6 @@ export default async function Page() {
 
   return (
     <div>
-      {/* Hero Header */}
-      <div className="bg-background-tertiary -mx-6 -mt-6 px-6 pt-10 pb-8 mb-8">
-        <p className="text-xs font-medium tracking-[0.25em] uppercase mb-3 text-label-tertiary/50">
-          News / Announcements
-        </p>
-        <div className="flex items-end justify-between">
-          <h1 className="text-5xl font-bold tracking-tight text-label-tertiary leading-none">
-            お知らせ
-          </h1>
-          {data && (
-            <p className="text-sm text-label-tertiary/40 pb-1 tabular-nums">
-              {data.announcements.length} 件
-            </p>
-          )}
-        </div>
-      </div>
-
       {error || !data ? (
         <div className="py-20 text-center">
           <p className="text-accent-error text-sm">
