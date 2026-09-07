@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,6 +11,11 @@ import {
   COURSES,
   GRADES,
   CLASSES,
+  TERM_MAP,
+  REQUIRED_TYPE_MAP,
+  CATEGORY_MAP,
+  COURSE_MAP,
+  GRADE_MAP,
   toggle,
   type Subject,
 } from "./constants";
@@ -20,14 +26,28 @@ import { PageHeaderActions } from "@/contexts/page-header-context";
 
 const SESSION_STORAGE_KEY = "subjects-search-state";
 
+const PARAM_KEYS = {
+  query: "q",
+  selectedTerms: "semesters",
+  selectedRequiredTypes: "requirementTypes",
+  selectedCategories: "classifications",
+  selectedCourses: "courses",
+  selectedGrades: "grades",
+  selectedClasses: "classes",
+} as const;
+
+function invertMap(map: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(map).map(([k, v]) => [v, k]));
+}
+
+const TERM_REVERSE_MAP = invertMap(TERM_MAP);
+const REQUIRED_TYPE_REVERSE_MAP = invertMap(REQUIRED_TYPE_MAP);
+const CATEGORY_REVERSE_MAP = invertMap(CATEGORY_MAP);
+const COURSE_REVERSE_MAP = invertMap(COURSE_MAP);
+const GRADE_REVERSE_MAP = invertMap(GRADE_MAP);
+
 type StoredState = {
-  query: string;
-  selectedTerms: string[];
-  selectedRequiredTypes: string[];
-  selectedCategories: string[];
-  selectedCourses: string[];
-  selectedGrades: string[];
-  selectedClasses: string[];
+  search: string;
   subjects: Subject[];
   slotEntries: [string, string[]][];
 };
@@ -43,38 +63,125 @@ function loadStoredState(): StoredState | null {
   }
 }
 
-export default function SubjectsSearchView() {
-  const restored = useRef(loadStoredState()).current;
+function parseSet(
+  params: URLSearchParams,
+  key: string,
+  reverseMap?: Record<string, string>,
+): Set<string> {
+  const value = params.get(key);
+  if (!value) return new Set();
+  const values = value.split(",").filter(Boolean);
+  if (!reverseMap) return new Set(values);
+  return new Set(values.map((v) => reverseMap[v]).filter(Boolean));
+}
 
-  const [query, setQuery] = useState(restored?.query ?? "");
+function buildSearchParams({
+  query,
+  selectedTerms,
+  selectedRequiredTypes,
+  selectedCategories,
+  selectedCourses,
+  selectedGrades,
+  selectedClasses,
+}: {
+  query: string;
+  selectedTerms: Set<string>;
+  selectedRequiredTypes: Set<string>;
+  selectedCategories: Set<string>;
+  selectedCourses: Set<string>;
+  selectedGrades: Set<string>;
+  selectedClasses: Set<string>;
+}): URLSearchParams {
+  const params = new URLSearchParams();
+  if (query) params.set(PARAM_KEYS.query, query);
+  const setEntries: [string, Set<string>, Record<string, string> | undefined][] = [
+    [PARAM_KEYS.selectedTerms, selectedTerms, TERM_MAP],
+    [PARAM_KEYS.selectedRequiredTypes, selectedRequiredTypes, REQUIRED_TYPE_MAP],
+    [PARAM_KEYS.selectedCategories, selectedCategories, CATEGORY_MAP],
+    [PARAM_KEYS.selectedCourses, selectedCourses, COURSE_MAP],
+    [PARAM_KEYS.selectedGrades, selectedGrades, GRADE_MAP],
+    [PARAM_KEYS.selectedClasses, selectedClasses, undefined],
+  ];
+  for (const [key, set, map] of setEntries) {
+    if (set.size === 0) continue;
+    const values = map ? [...set].map((v) => map[v]).filter(Boolean) : [...set];
+    if (values.length > 0) params.set(key, values.join(","));
+  }
+  return params;
+}
+
+export default function SubjectsSearchView({
+  initialHasCondition,
+  initialHasError,
+  initialSubjects,
+  initialSlotEntries,
+}: {
+  initialHasCondition: boolean;
+  initialHasError: boolean;
+  initialSubjects: Subject[];
+  initialSlotEntries: [string, string[]][];
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const initialParams = useRef(
+    new URLSearchParams(searchParams.toString()),
+  ).current;
+  const restored = useRef(loadStoredState()).current;
+  const hasMatchingCache =
+    !initialHasCondition && restored?.search === initialParams.toString();
+
+  const [query, setQuery] = useState(
+    initialParams.get(PARAM_KEYS.query) ?? "",
+  );
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(
-    new Set(restored?.selectedTerms),
+    parseSet(initialParams, PARAM_KEYS.selectedTerms, TERM_REVERSE_MAP),
   );
   const [selectedRequiredTypes, setSelectedRequiredTypes] = useState<
     Set<string>
-  >(new Set(restored?.selectedRequiredTypes));
+  >(
+    parseSet(
+      initialParams,
+      PARAM_KEYS.selectedRequiredTypes,
+      REQUIRED_TYPE_REVERSE_MAP,
+    ),
+  );
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set(restored?.selectedCategories),
+    parseSet(
+      initialParams,
+      PARAM_KEYS.selectedCategories,
+      CATEGORY_REVERSE_MAP,
+    ),
   );
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(
-    new Set(restored?.selectedCourses),
+    parseSet(initialParams, PARAM_KEYS.selectedCourses, COURSE_REVERSE_MAP),
   );
   const [selectedGrades, setSelectedGrades] = useState<Set<string>>(
-    new Set(restored?.selectedGrades),
+    parseSet(initialParams, PARAM_KEYS.selectedGrades, GRADE_REVERSE_MAP),
   );
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(
-    new Set(restored?.selectedClasses),
+    parseSet(initialParams, PARAM_KEYS.selectedClasses),
   );
   const [subjects, setSubjects] = useState<Subject[]>(
-    restored?.subjects ?? [],
+    initialHasCondition
+      ? initialSubjects
+      : hasMatchingCache
+        ? (restored?.subjects ?? [])
+        : [],
   );
   const [slotMap, setSlotMap] = useState<Map<string, string[]>>(
-    new Map(restored?.slotEntries),
+    new Map(
+      initialHasCondition
+        ? initialSlotEntries
+        : hasMatchingCache
+          ? restored?.slotEntries
+          : undefined,
+    ),
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const skipNextFetch = useRef(restored !== null);
+  const [hasError, setHasError] = useState(initialHasError);
+  const [hasSearched, setHasSearched] = useState(initialHasCondition);
+  const skipNextFetch = useRef(initialHasCondition || hasMatchingCache);
   const pendingAbort = useRef<AbortController | null>(null);
   const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -101,6 +208,7 @@ export default function SubjectsSearchView() {
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
+    router.replace(pathname, { scroll: false });
   }
 
   async function runSearch(signal: AbortSignal) {
@@ -144,6 +252,19 @@ export default function SubjectsSearchView() {
   }
 
   useEffect(() => {
+    const params = buildSearchParams({
+      query,
+      selectedTerms,
+      selectedRequiredTypes,
+      selectedCategories,
+      selectedCourses,
+      selectedGrades,
+      selectedClasses,
+    });
+    const search = params.toString();
+    const url = search ? `${pathname}?${search}` : pathname;
+    router.replace(url, { scroll: false });
+
     if (!hasCondition) {
       return;
     }
@@ -177,6 +298,8 @@ export default function SubjectsSearchView() {
     selectedGrades,
     selectedClasses,
     hasCondition,
+    pathname,
+    router,
   ]);
 
   useEffect(() => {
@@ -185,14 +308,17 @@ export default function SubjectsSearchView() {
       window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
       return;
     }
-    const stored: StoredState = {
+    const search = buildSearchParams({
       query,
-      selectedTerms: [...selectedTerms],
-      selectedRequiredTypes: [...selectedRequiredTypes],
-      selectedCategories: [...selectedCategories],
-      selectedCourses: [...selectedCourses],
-      selectedGrades: [...selectedGrades],
-      selectedClasses: [...selectedClasses],
+      selectedTerms,
+      selectedRequiredTypes,
+      selectedCategories,
+      selectedCourses,
+      selectedGrades,
+      selectedClasses,
+    }).toString();
+    const stored: StoredState = {
+      search,
       subjects,
       slotEntries: [...slotMap.entries()],
     };
