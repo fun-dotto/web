@@ -1,4 +1,5 @@
 import { ChevronRightIcon, Plus, type LucideIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   title: string;
@@ -9,6 +10,7 @@ type Props = {
   trailingIcon?: LucideIcon | null;
   onTapped?: () => void;
   onLeadingIconTapped?: () => void;
+  isLoading?: boolean;
 };
 
 export function ListItem({
@@ -20,7 +22,27 @@ export function ListItem({
   trailingIcon: TrailingIcon = ChevronRightIcon,
   onTapped,
   onLeadingIconTapped,
+  isLoading = false,
 }: Props) {
+  if (isLoading) {
+    return (
+      <div className="w-full flex items-center justify-between gap-3 px-4 py-3 border-b border-border-primary">
+        <div className="flex flex-row items-center gap-3">
+          {LeadingIcon && <Skeleton className="w-6 h-6 rounded-full" />}
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-4 w-32" />
+            {description1 && <Skeleton className="h-3 w-24" />}
+            {description2 && <Skeleton className="h-3 w-20" />}
+          </div>
+        </div>
+        <div className="flex flex-row items-center gap-3">
+          {value && <Skeleton className="h-3 w-8" />}
+          {TrailingIcon && <Skeleton className="w-5 h-5" />}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="w-full flex items-center justify-between gap-3 px-4 py-3 border-b border-border-primary hover:bg-background-primary transition-colors cursor-pointer"
