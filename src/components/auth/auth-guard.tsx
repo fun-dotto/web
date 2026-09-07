@@ -63,7 +63,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         <AppSidebar />
         <SidebarInset>
           <PageHeader pathname={pathname} />
-          <main className="flex-1 p-6 bg-background-primary">{children}</main>
+          <main className="flex-1 p-6 bg-background-primary @container">
+            {children}
+          </main>
         </SidebarInset>
       </PageHeaderTitleProvider>
     </SidebarProvider>
