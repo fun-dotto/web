@@ -115,7 +115,7 @@ export default function SubjectsSearchView() {
   const displaySubjects = hasCondition ? subjects : [];
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex flex-col @[768px]:flex-row items-stretch @[768px]:items-start gap-4">
       {hasCondition && (
         <PageHeaderActions>
           <button
@@ -127,7 +127,7 @@ export default function SubjectsSearchView() {
         </PageHeaderActions>
       )}
       {/* 左カラム: 検索入力 + フィルター */}
-      <div className="w-72 shrink-0 space-y-0">
+      <div className="w-full @[768px]:w-72 shrink-0 space-y-0">
         {/* 検索入力 */}
         <div className="relative border-b-2 border-border-primary py-3">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-label-secondary pointer-events-none" />
