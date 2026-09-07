@@ -56,3 +56,19 @@ export const WithValue: Story = {
     </div>
   ),
 };
+
+export const Loading: Story = {
+  args: {
+    title: "",
+    description1: " ",
+    description2: " ",
+    value: " ",
+    leadingIcon: Plus,
+    isLoading: true,
+  },
+  render: (args) => (
+    <div className="w-96">
+      <ListItem {...args} />
+    </div>
+  ),
+};
