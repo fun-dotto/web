@@ -13,7 +13,10 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "Dotto - 公立はこだて未来大学ポータルアプリ",
+  title: {
+    default: "Dotto - 公立はこだて未来大学ポータルアプリ",
+    template: "%s - Dotto",
+  },
   description:
     "Dottoは2023年12月から運用されている、公立はこだて未来大学のポータルアプリです。",
 };
