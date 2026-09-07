@@ -206,13 +206,13 @@ export default function SubjectsSearchView() {
       {/* 左カラム: 検索入力 + フィルター */}
       <div className="w-full @[768px]:w-72 shrink-0 space-y-0">
         {/* 検索入力 */}
-        <div className="relative border-b-2 border-border-primary py-3">
+        <div className="relative py-3">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-label-secondary pointer-events-none" />
           <Input
             placeholder="科目名で検索"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9 border-none shadow-none bg-transparent focus-visible:ring-0"
+            className="pl-9 border border-border-primary shadow-none bg-background-secondary focus-visible:ring-0"
           />
         </div>
 

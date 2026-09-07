@@ -15,7 +15,7 @@ export function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1 text-sm rounded-lg border-2 transition-colors whitespace-nowrap ${
+      className={`px-3 py-1 text-sm rounded-lg border transition-colors whitespace-nowrap ${
         selected
           ? "bg-accent-brand text-label-tertiary border-accent-brand"
           : "bg-background-secondary text-label-secondary border-border-primary hover:border-accent-brand"
@@ -63,7 +63,7 @@ export function FilterSection({
 }) {
   const [open, setOpen] = useState(true);
   return (
-    <div className="border-b-2 border-border-primary">
+    <div className="border-b border-border-primary">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-3 text-left"
