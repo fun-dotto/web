@@ -6,6 +6,7 @@ import { pageTitleForPathname } from "@/components/layout/nav-sections";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   PageHeaderTitleProvider,
+  usePageHeaderActions,
   usePageHeaderTitle,
 } from "@/contexts/page-header-context";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import { useEffect } from "react";
 
 function PageHeader({ pathname }: { pathname: string }) {
   const overrideTitle = usePageHeaderTitle();
+  const actions = usePageHeaderActions();
   const pageTitle = overrideTitle ?? pageTitleForPathname(pathname);
 
   return (
@@ -23,6 +25,7 @@ function PageHeader({ pathname }: { pathname: string }) {
           {pageTitle}
         </h1>
       )}
+      {actions && <div className="ml-auto flex items-center">{actions}</div>}
     </header>
   );
 }
