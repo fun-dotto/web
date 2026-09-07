@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getMacPages } from "@/lib/notion";
+import { ListItem } from "@/components/dotto/list-item";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +71,7 @@ export default async function MacPage() {
           <p className="text-label-secondary text-sm">ページがありません</p>
         </div>
       ) : (
-        <ul className="divide-y divide-border-primary">
+        <ul className="max-w-xl mx-auto">
           {pages.map((page) => {
             const title = getTitle(page);
             const tags = getTags(page);
@@ -87,52 +88,20 @@ export default async function MacPage() {
                 ? formatDate(lastEditedDate)
                 : "";
             const pageId = page.id.replace(/-/g, "");
+            const value = lastEdited
+              ? `${lastEdited} 更新`
+              : createdAt
+                ? `${createdAt} 作成`
+                : undefined;
 
             return (
               <li key={page.id}>
-                <Link
-                  href={`/mac/${pageId}`}
-                  className="group flex items-center gap-5 py-4 -mx-2 px-2 rounded-lg hover:bg-background-secondary transition-colors duration-200"
-                >
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-label-primary group-hover:text-accent-info transition-colors duration-200">
-                      {title}
-                    </p>
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-1.5">
-                        {tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-xs px-2 py-0.5 rounded-full border border-border-primary text-label-secondary bg-background-primary"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Date */}
-                  {(createdAt || lastEdited) && (
-                    <div className="hidden sm:flex flex-col items-end gap-0.5 text-xs shrink-0 tabular-nums">
-                      {createdAt && (
-                        <span className="text-label-primary">
-                          {createdAt} 作成
-                        </span>
-                      )}
-                      {lastEdited && (
-                        <span className="text-label-secondary">
-                          {lastEdited} 更新
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Arrow */}
-                  <span className="text-label-primary/20 group-hover:text-accent-info group-hover:translate-x-1 transition-all duration-200 shrink-0 text-sm">
-                    →
-                  </span>
+                <Link href={`/mac/${pageId}`} className="block">
+                  <ListItem
+                    title={title}
+                    description1={tags.length > 0 ? tags.join("、") : undefined}
+                    value={value}
+                  />
                 </Link>
               </li>
             );
