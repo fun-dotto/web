@@ -5,12 +5,10 @@
     "dotto-notion"
   ],
   "enabledPlugins": {
-    "chrome-devtools-mcp@chrome-devtools-plugins": true,
-    "code-review@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true,
     "codex@openai-codex": true,
     "context7@claude-plugins-official": true,
-    "firebase@firebase": true,
-    "pr-review-toolkit@claude-plugins-official": true
+    "firebase@claude-plugins-official": true
   },
   "permissions": {
     "allow": [
