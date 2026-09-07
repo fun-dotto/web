@@ -127,6 +127,7 @@ export default function SubjectsSearchView({
   const initialParams = useRef(
     new URLSearchParams(searchParams.toString()),
   ).current;
+  const lastSyncedSearch = useRef(initialParams.toString());
   const restored = useRef(loadStoredState()).current;
   const hasMatchingCache =
     !initialHasCondition && restored?.search === initialParams.toString();
@@ -263,6 +264,7 @@ export default function SubjectsSearchView({
     });
     const search = params.toString();
     const url = search ? `${pathname}?${search}` : pathname;
+    lastSyncedSearch.current = search;
     router.replace(url, { scroll: false });
 
     if (!hasCondition) {
@@ -301,6 +303,35 @@ export default function SubjectsSearchView({
     pathname,
     router,
   ]);
+
+  useEffect(() => {
+    const currentSearch = searchParams.toString();
+    if (currentSearch === lastSyncedSearch.current) {
+      return;
+    }
+    lastSyncedSearch.current = currentSearch;
+    if (currentSearch) {
+      return;
+    }
+    // サイドバーの「科目検索」リンクなど、自分の router.replace 以外の
+    // 要因でクエリパラメータが空になった場合は検索条件をリセットする
+    pendingTimer.current && clearTimeout(pendingTimer.current);
+    pendingAbort.current?.abort();
+    skipNextFetch.current = false;
+    setQuery("");
+    setSelectedTerms(new Set());
+    setSelectedRequiredTypes(new Set());
+    setSelectedCategories(new Set());
+    setSelectedCourses(new Set());
+    setSelectedGrades(new Set());
+    setSelectedClasses(new Set());
+    setSubjects([]);
+    setSlotMap(new Map());
+    setHasSearched(false);
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
