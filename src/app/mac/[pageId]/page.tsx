@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -6,6 +5,10 @@ import { getPage, getPageBlocks } from "@/lib/notion";
 import { blocksToMarkdown } from "@/lib/notion-markdown";
 import { NotionRenderer } from "@/components/notion/NotionRenderer";
 import { CopyMarkdownButton } from "@/components/notion/CopyMarkdownButton";
+import {
+  PageHeaderActions,
+  PageHeaderTitle,
+} from "@/contexts/page-header-context";
 
 export const dynamic = "force-dynamic";
 
@@ -89,59 +92,44 @@ export default async function MacDetailPage({
       : "";
 
   return (
-    <div>
-      {/* Header */}
-      <div className="bg-background-tertiary -mx-6 -mt-6 px-6 pt-6 pb-8 mb-8">
-        <Link
-          href="/mac"
-          className="group inline-flex items-center gap-1.5 text-xs text-label-tertiary/50 hover:text-label-tertiary/80 transition-colors duration-200 mb-6"
-        >
-          <span className="group-hover:-translate-x-0.5 transition-transform duration-200 inline-block">
-            ←
-          </span>
-          <span>Mac サポート</span>
-        </Link>
+    <div className="flex justify-center">
+      <div className="flex-1 max-w-3xl">
+        <PageHeaderTitle title={title} />
+        <PageHeaderActions>
+          <CopyMarkdownButton markdown={blocksToMarkdown(title, blocks)} />
+        </PageHeaderActions>
 
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <h1 className="text-4xl font-bold tracking-tight text-label-tertiary leading-tight">
-            {title}
-          </h1>
-          <div className="shrink-0 pt-2">
-            <CopyMarkdownButton markdown={blocksToMarkdown(title, blocks)} />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 mb-8">
           {tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-2.5 py-0.5 rounded-full border border-label-tertiary/20 text-label-tertiary/60"
+              className="text-xs px-2.5 py-0.5 rounded-full border border-label-secondary/20 text-label-secondary"
             >
               {tag}
             </span>
           ))}
           {createdAt && (
-            <span className="text-xs text-label-tertiary/40 tabular-nums">
+            <span className="text-xs text-label-secondary/60 tabular-nums">
               {createdAt} 作成
             </span>
           )}
           {lastEdited && (
-            <span className="text-xs text-label-tertiary/40 tabular-nums">
+            <span className="text-xs text-label-secondary/60 tabular-nums">
               {lastEdited} 更新
             </span>
           )}
         </div>
-      </div>
 
-      {/* Content */}
-      <div>
-        {blocks.length === 0 ? (
-          <p className="text-center text-label-secondary text-sm py-8">
-            コンテンツがありません
-          </p>
-        ) : (
-          <NotionRenderer blocks={blocks} />
-        )}
+        {/* Content */}
+        <div>
+          {blocks.length === 0 ? (
+            <p className="text-center text-label-secondary text-sm py-8">
+              コンテンツがありません
+            </p>
+          ) : (
+            <NotionRenderer blocks={blocks} />
+          )}
+        </div>
       </div>
     </div>
   );
