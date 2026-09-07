@@ -20,6 +20,16 @@ export type SubjectsSearchParams = {
   selectedClasses?: Set<string>;
 };
 
+export type ApiSubjectsQuery = {
+  q?: string;
+  semesters?: string[];
+  requirementTypes?: string[];
+  classifications?: string[];
+  courses?: string[];
+  grades?: string[];
+  classes?: string[];
+};
+
 function mapSet(
   set: Set<string> | undefined,
   map: Record<string, string>,
@@ -29,37 +39,30 @@ function mapSet(
   return result.length > 0 ? result : undefined;
 }
 
-export async function fetchSubjectsAndSlots(
-  params: SubjectsSearchParams = {},
+export async function fetchSubjectsAndSlotsByApiParams(
+  params: ApiSubjectsQuery = {},
   signal?: AbortSignal,
 ): Promise<{
   subjects: Subject[];
   hasError: boolean;
   slotEntries: [string, string[]][];
 }> {
-  const mappedTerms = mapSet(params.selectedTerms, TERM_MAP);
-  const semesters = mappedTerms ?? ALL_SEMESTERS;
+  const semesters =
+    params.semesters && params.semesters.length > 0
+      ? params.semesters
+      : ALL_SEMESTERS;
 
   const [subjectsRes, timetableRes] = await Promise.all([
     api.GET("/v1/subjects", {
       params: {
         query: {
-          q: params.query || undefined,
-          semesters: mappedTerms as never,
-          requirementTypes: mapSet(
-            params.selectedRequiredTypes,
-            REQUIRED_TYPE_MAP,
-          ) as never,
-          classifications: mapSet(
-            params.selectedCategories,
-            CATEGORY_MAP,
-          ) as never,
-          courses: mapSet(params.selectedCourses, COURSE_MAP) as never,
-          grades: mapSet(params.selectedGrades, GRADE_MAP) as never,
-          classes:
-            params.selectedClasses && params.selectedClasses.size > 0
-              ? ([...params.selectedClasses] as never)
-              : undefined,
+          q: params.q || undefined,
+          semesters: params.semesters as never,
+          requirementTypes: params.requirementTypes as never,
+          classifications: params.classifications as never,
+          courses: params.courses as never,
+          grades: params.grades as never,
+          classes: params.classes as never,
         },
       },
       signal,
@@ -96,4 +99,32 @@ export async function fetchSubjectsAndSlots(
     hasError: !!subjectsRes.error || !subjectsRes.data,
     slotEntries,
   };
+}
+
+export async function fetchSubjectsAndSlots(
+  params: SubjectsSearchParams = {},
+  signal?: AbortSignal,
+): Promise<{
+  subjects: Subject[];
+  hasError: boolean;
+  slotEntries: [string, string[]][];
+}> {
+  return fetchSubjectsAndSlotsByApiParams(
+    {
+      q: params.query || undefined,
+      semesters: mapSet(params.selectedTerms, TERM_MAP),
+      requirementTypes: mapSet(
+        params.selectedRequiredTypes,
+        REQUIRED_TYPE_MAP,
+      ),
+      classifications: mapSet(params.selectedCategories, CATEGORY_MAP),
+      courses: mapSet(params.selectedCourses, COURSE_MAP),
+      grades: mapSet(params.selectedGrades, GRADE_MAP),
+      classes:
+        params.selectedClasses && params.selectedClasses.size > 0
+          ? [...params.selectedClasses]
+          : undefined,
+    },
+    signal,
+  );
 }
