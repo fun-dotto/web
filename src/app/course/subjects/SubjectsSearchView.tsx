@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { SearchIcon, ChevronUpIcon } from "lucide-react";
 import { ListItem } from "@/components/dotto/list-item";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
 import type { components } from "@/types/api";
+import Link from "next/link";
 
 const TERMS = [
   "前期",
@@ -187,7 +187,6 @@ function FilterSection({
 }
 
 export default function SubjectsSearchView() {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
   const [selectedRequiredTypes, setSelectedRequiredTypes] = useState<
@@ -453,14 +452,13 @@ export default function SubjectsSearchView() {
                   .join(" ");
                 return (
                   <li key={subject.id}>
-                    <ListItem
-                      title={subject.name}
-                      description1={infoLabel}
-                      description2={facultyLabel}
-                      onTapped={() =>
-                        router.push(`/course/subjects/${subject.id}`)
-                      }
-                    />
+                    <Link href={`/course/subjects/${subject.id}`}>
+                      <ListItem
+                        title={subject.name}
+                        description1={infoLabel}
+                        description2={facultyLabel}
+                      />
+                    </Link>
                   </li>
                 );
               })
