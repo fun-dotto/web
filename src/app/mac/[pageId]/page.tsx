@@ -1,19 +1,19 @@
-import { notFound } from "next/navigation";
-import type { Metadata } from "next";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { getPage, getPageBlocks } from "@/lib/notion";
-import { blocksToMarkdown } from "@/lib/notion-markdown";
-import { NotionRenderer } from "@/components/notion/NotionRenderer";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CopyMarkdownButton } from "@/components/notion/CopyMarkdownButton";
+import { NotionRenderer } from "@/components/notion/NotionRenderer";
 import {
   PageHeaderActions,
   PageHeaderTitle,
 } from "@/contexts/page-header-context";
+import { getPage, getPageBlocks } from "@/lib/notion";
+import { blocksToMarkdown } from "@/lib/notion-markdown";
 
 export const dynamic = "force-dynamic";
 
 function getTitle(page: PageObjectResponse): string {
-  const prop = page.properties["ページ"];
+  const prop = page.properties.ページ;
   if (prop?.type === "title") {
     return prop.title.map((t) => t.plain_text).join("") || "無題";
   }
@@ -21,7 +21,7 @@ function getTitle(page: PageObjectResponse): string {
 }
 
 function getTags(page: PageObjectResponse): string[] {
-  const prop = page.properties["タグ"];
+  const prop = page.properties.タグ;
   if (prop?.type === "multi_select") {
     return prop.multi_select.map((s) => s.name);
   }
@@ -37,7 +37,7 @@ function formatDate(date: Date): string {
 }
 
 function getCreatedAtDate(page: PageObjectResponse): Date | null {
-  const prop = page.properties["公開開始日時"];
+  const prop = page.properties.公開開始日時;
   if (prop?.type === "date" && prop.date?.start) {
     return new Date(prop.date.start);
   }
@@ -45,7 +45,7 @@ function getCreatedAtDate(page: PageObjectResponse): Date | null {
 }
 
 function getLastEditedDate(page: PageObjectResponse): Date | null {
-  const prop = page.properties["最終更新日時"];
+  const prop = page.properties.最終更新日時;
   if (prop?.type === "last_edited_time") {
     return new Date(prop.last_edited_time);
   }

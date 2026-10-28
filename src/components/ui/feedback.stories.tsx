@@ -26,8 +26,14 @@ export const LoadingSkeleton: Story = {
 export const Separators: Story = {
   render: () => (
     <div className="flex h-20 items-center gap-4">
-      <span>左</span><Separator orientation="vertical" /><span>右</span>
-      <div className="w-40 space-y-3"><span>上</span><Separator /><span>下</span></div>
+      <span>左</span>
+      <Separator orientation="vertical" />
+      <span>右</span>
+      <div className="w-40 space-y-3">
+        <span>上</span>
+        <Separator />
+        <span>下</span>
+      </div>
     </div>
   ),
 };

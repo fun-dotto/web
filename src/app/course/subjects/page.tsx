@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import SubjectsSearchView from "@/app/course/subjects/SubjectsSearchView";
 import { fetchSubjectsAndSlotsByApiParams } from "@/app/course/subjects/fetch-subjects";
+import SubjectsSearchView from "@/app/course/subjects/SubjectsSearchView";
 
 export const metadata: Metadata = {
   title: "科目検索",

@@ -1,16 +1,20 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { pageTitleForPathname } from "@/components/layout/nav-sections";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/auth-context";
 import {
   PageHeaderTitleProvider,
   usePageHeaderActions,
   usePageHeaderTitle,
 } from "@/contexts/page-header-context";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 function PageHeader({ pathname }: { pathname: string }) {
   const overrideTitle = usePageHeaderTitle();

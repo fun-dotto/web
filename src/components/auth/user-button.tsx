@@ -1,16 +1,14 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/contexts/auth-context";
 
 export function UserButton() {
   const { user, loading, signOutUser } = useAuth();
 
   if (loading) {
-    return (
-      <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
-    );
+    return <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />;
   }
 
   if (!user) {
@@ -40,6 +38,7 @@ export function UserButton() {
         </div>
       )}
       <button
+        type="button"
         onClick={signOutUser}
         className="text-sm font-medium text-gray-700 hover:text-gray-900"
       >

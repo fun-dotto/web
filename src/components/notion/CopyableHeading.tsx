@@ -49,7 +49,9 @@ export function CopyableHeading({
       </span>
       <span className="flex-1">{children}</span>
       {copied && (
-        <span className="text-xs text-accent-info shrink-0">コピーしました</span>
+        <span className="text-xs text-accent-info shrink-0">
+          コピーしました
+        </span>
       )}
     </button>
   );

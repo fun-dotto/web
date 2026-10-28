@@ -24,7 +24,10 @@ export const Variants: Story = {
       <Badge variant="outline">Outline</Badge>
       <Badge variant="ghost">Ghost</Badge>
       <Badge variant="link">Link</Badge>
-      <Badge><Check data-icon="inline-start" />完了</Badge>
+      <Badge>
+        <Check data-icon="inline-start" />
+        完了
+      </Badge>
     </div>
   ),
 };

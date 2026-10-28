@@ -16,7 +16,8 @@ const firebaseConfig = {
 };
 
 const appCheckSiteKey = process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY;
-const appCheckDebugToken = process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN;
+const appCheckDebugToken =
+  process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN;
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 

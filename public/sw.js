@@ -15,10 +15,10 @@ self.addEventListener("activate", (event) => {
       await Promise.all(
         cacheNames
           .filter((cacheName) => !CURRENT_CACHES.includes(cacheName))
-          .map((cacheName) => caches.delete(cacheName))
+          .map((cacheName) => caches.delete(cacheName)),
       );
       await self.clients.claim();
-    })()
+    })(),
   );
 });
 

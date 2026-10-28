@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronUpIcon } from "lucide-react";
+import { useState } from "react";
 
 export function FilterChip({
   label,
@@ -14,6 +14,7 @@ export function FilterChip({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`px-3 py-1 text-sm rounded-lg border transition-colors whitespace-nowrap ${
         selected
@@ -65,6 +66,7 @@ export function FilterSection({
   return (
     <div className="border-b border-border-primary">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-3 text-left"
       >

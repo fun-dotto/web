@@ -1,14 +1,14 @@
 import { Client } from "@notionhq/client";
-import { unstable_cache } from "next/cache";
 import type {
   BlockObjectResponse,
   DatabaseObjectResponse,
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import { unstable_cache } from "next/cache";
 
 export const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
-const databaseId = process.env.NOTION_MAC_DATABASE_ID!;
+const databaseId = process.env.NOTION_MAC_DATABASE_ID ?? "";
 const isProduction = process.env.NODE_ENV === "production";
 const MAC_CACHE_REVALIDATE_SECONDS = 15 * 60;
 
@@ -37,7 +37,7 @@ async function getMacPagesRaw(): Promise<PageObjectResponse[]> {
     sorts: [{ property: "最終更新日時", direction: "descending" }],
   });
   return res.results.filter(
-    (p): p is PageObjectResponse => p.object === "page"
+    (p): p is PageObjectResponse => p.object === "page",
   );
 }
 
@@ -54,7 +54,7 @@ async function getPageRaw(pageId: string): Promise<PageObjectResponse> {
 }
 
 export async function getPageBlocks(
-  pageId: string
+  pageId: string,
 ): Promise<BlockObjectResponse[]> {
   if (!isProduction) {
     return getPageBlocksRaw(pageId);
@@ -63,7 +63,7 @@ export async function getPageBlocks(
 }
 
 async function getPageBlocksRaw(
-  pageId: string
+  pageId: string,
 ): Promise<BlockObjectResponse[]> {
   const res = await notion.blocks.children.list({ block_id: pageId });
   return res.results.filter((b): b is BlockObjectResponse => "type" in b);
@@ -77,6 +77,10 @@ const getPageCached = unstable_cache(getPageRaw, ["mac-page"], {
   revalidate: MAC_CACHE_REVALIDATE_SECONDS,
 });
 
-const getPageBlocksCached = unstable_cache(getPageBlocksRaw, ["mac-page-blocks"], {
-  revalidate: MAC_CACHE_REVALIDATE_SECONDS,
-});
+const getPageBlocksCached = unstable_cache(
+  getPageBlocksRaw,
+  ["mac-page-blocks"],
+  {
+    revalidate: MAC_CACHE_REVALIDATE_SECONDS,
+  },
+);

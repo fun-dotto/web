@@ -63,11 +63,7 @@ export function PageHeaderTitle({ title }: { title: string }) {
   return null;
 }
 
-export function PageHeaderActions({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function PageHeaderActions({ children }: { children: React.ReactNode }) {
   const context = useContext(PageHeaderTitleContext);
   if (!context) {
     throw new Error(

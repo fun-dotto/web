@@ -1,12 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Bell, BookOpen, Home } from "lucide-react";
-
-import { TooltipProvider } from "./tooltip";
 import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
-  SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton,
-  SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
 } from "./sidebar";
+import { TooltipProvider } from "./tooltip";
 
 const meta = {
   title: "UI/Sidebar",
@@ -36,7 +45,8 @@ export const Default: Story = {
                   {items.map(({ label, icon: Icon, active }) => (
                     <SidebarMenuItem key={label}>
                       <SidebarMenuButton isActive={active} tooltip={label}>
-                        <Icon /><span>{label}</span>
+                        <Icon />
+                        <span>{label}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -48,7 +58,9 @@ export const Default: Story = {
         </Sidebar>
         <SidebarInset className="min-h-svh p-4">
           <SidebarTrigger />
-          <div className="grid flex-1 place-items-center text-muted-foreground">メインコンテンツ</div>
+          <div className="grid flex-1 place-items-center text-muted-foreground">
+            メインコンテンツ
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

@@ -363,10 +363,7 @@
   },
   "claudecode": {
     "defaultMode": "default",
-    "enabledMcpjsonServers": [
-      "dotto-figma",
-      "dotto-notion"
-    ],
+    "enabledMcpjsonServers": ["dotto-figma", "dotto-notion"],
     "enabledPlugins": {
       "chrome-devtools-mcp@claude-plugins-official": true,
       "codex@openai-codex": true,
