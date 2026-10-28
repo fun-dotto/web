@@ -1,6 +1,6 @@
 packages: []
 allowBuilds:
-  '@firebase/util': false
+  "@firebase/util": false
   esbuild: true
   msw: false
   protobufjs: false

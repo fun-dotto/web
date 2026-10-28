@@ -11,11 +11,27 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "outline", "secondary", "ghost", "destructive", "link"],
+      options: [
+        "default",
+        "outline",
+        "secondary",
+        "ghost",
+        "destructive",
+        "link",
+      ],
     },
     size: {
       control: "select",
-      options: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+      options: [
+        "default",
+        "xs",
+        "sm",
+        "lg",
+        "icon",
+        "icon-xs",
+        "icon-sm",
+        "icon-lg",
+      ],
     },
   },
 } satisfies Meta<typeof Button>;
@@ -44,8 +60,12 @@ export const SizesAndIcons: Story = {
       <Button size="xs">Extra small</Button>
       <Button size="sm">Small</Button>
       <Button>Default</Button>
-      <Button size="lg">Large <ArrowRight /></Button>
-      <Button size="icon" aria-label="追加"><Plus /></Button>
+      <Button size="lg">
+        Large <ArrowRight />
+      </Button>
+      <Button size="icon" aria-label="追加">
+        <Plus />
+      </Button>
     </div>
   ),
 };

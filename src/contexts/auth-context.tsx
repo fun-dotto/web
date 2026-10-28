@@ -1,14 +1,14 @@
 "use client";
 
-import { auth } from "@/lib/firebase";
 import {
   GoogleAuthProvider,
-  User,
   onIdTokenChanged,
   signInWithPopup,
   signOut,
+  type User,
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "@/lib/firebase";
 
 type AuthContextType = {
   user: User | null;
@@ -72,7 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOutUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, signInWithGoogle, signOutUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

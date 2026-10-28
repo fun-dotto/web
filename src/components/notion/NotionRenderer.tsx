@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type {
   BlockObjectResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import Link from "next/link";
 import { CopyableHeading } from "./CopyableHeading";
 import { CopyCodeButton } from "./CopyCodeButton";
 
@@ -18,7 +18,7 @@ function extractNotionIds(href: string): {
 } {
   const matches = [
     ...href.matchAll(
-      /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32})/gi
+      /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32})/gi,
     ),
   ];
   const [first, second] = matches;
@@ -31,12 +31,11 @@ function extractNotionIds(href: string): {
 function resolveInternalHref(item: RichTextItemResponse): string | null {
   if (item.type === "mention" && item.mention.type === "page") {
     const pageId = normalizeNotionPageId(item.mention.page.id);
-    const blockId = item.href
-      ? extractNotionIds(item.href).blockId
-      : null;
-    const normalizedBlock =
-      blockId && blockId !== pageId ? blockId : null;
-    return normalizedBlock ? `/mac/${pageId}#${normalizedBlock}` : `/mac/${pageId}`;
+    const blockId = item.href ? extractNotionIds(item.href).blockId : null;
+    const normalizedBlock = blockId && blockId !== pageId ? blockId : null;
+    return normalizedBlock
+      ? `/mac/${pageId}#${normalizedBlock}`
+      : `/mac/${pageId}`;
   }
   if (item.href) {
     const isNotionLink =
@@ -99,6 +98,7 @@ function RichText({ items }: { items: RichTextItemResponse[] }) {
           );
         }
 
+        // biome-ignore lint/suspicious/noArrayIndexKey: リッチテキストの並びは不変で一意なIDがない
         return <span key={i}>{node}</span>;
       })}
     </>
@@ -106,7 +106,7 @@ function RichText({ items }: { items: RichTextItemResponse[] }) {
 }
 
 function getImageUrl(
-  image: Extract<BlockObjectResponse, { type: "image" }>["image"]
+  image: Extract<BlockObjectResponse, { type: "image" }>["image"],
 ): string {
   if (image.type === "external") return image.external.url;
   return image.file.url;
@@ -215,7 +215,7 @@ export function NotionBlock({ block }: { block: BlockObjectResponse }) {
       const url = getImageUrl(block.image);
       return (
         <figure className="mb-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* biome-ignore lint/performance/noImgElement: Notion の署名付きURLは期限付きのため next/image を使わない */}
           <img
             src={url}
             alt={block.image.caption.map((t) => t.plain_text).join("") || ""}

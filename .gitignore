@@ -49,3 +49,17 @@ next-env.d.ts
 
 # generated from public/.well-known/apple-app-site-association-{dev,stg,prd}
 /public/.well-known/apple-app-site-association
+
+**/AGENTS.md
+**/CLAUDE.md
+.agents/*
+.claude/*
+.cloudflare/*
+.codex/*
+.github/*
+!.github/actions/
+!.github/ISSUE_TEMPLATE/
+!.github/workflows/
+!.github/PULL_REQUEST_TEMPLATE.md
+.mcp.json
+mise.local.toml

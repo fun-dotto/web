@@ -1,10 +1,10 @@
-import { AuthProvider } from "@/contexts/auth-context";
-import { AuthGuard } from "@/components/auth/auth-guard";
-import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
+import { AuthGuard } from "@/components/auth/auth-guard";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/auth-context";
 import "./globals.css";
 
 const notoSansJP = Noto_Sans_JP({

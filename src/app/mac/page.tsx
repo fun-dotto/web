@@ -1,8 +1,8 @@
-import Link from "next/link";
-import type { Metadata } from "next";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { getMacPages } from "@/lib/notion";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { ListItem } from "@/components/dotto/list-item";
+import { getMacPages } from "@/lib/notion";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 function getTitle(page: PageObjectResponse): string {
-  const prop = page.properties["ページ"];
+  const prop = page.properties.ページ;
   if (prop?.type === "title") {
     return prop.title.map((t) => t.plain_text).join("") || "無題";
   }
@@ -20,7 +20,7 @@ function getTitle(page: PageObjectResponse): string {
 }
 
 function getTags(page: PageObjectResponse): string[] {
-  const prop = page.properties["タグ"];
+  const prop = page.properties.タグ;
   if (prop?.type === "multi_select") {
     return prop.multi_select.map((s) => s.name);
   }
@@ -77,7 +77,7 @@ export default async function MacPage() {
             const tags = getTags(page);
             const createdAtDate = getDateStart(page, "公開開始日時");
             const createdAt = createdAtDate ? formatDate(createdAtDate) : "";
-            const lastEditedProp = page.properties["最終更新日時"];
+            const lastEditedProp = page.properties.最終更新日時;
             const lastEditedDate =
               lastEditedProp?.type === "last_edited_time"
                 ? new Date(lastEditedProp.last_edited_time)

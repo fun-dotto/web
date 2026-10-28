@@ -1,4 +1,4 @@
-import { ChevronRightIcon, Plus, type LucideIcon } from "lucide-react";
+import { ChevronRightIcon, type LucideIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
@@ -12,6 +12,21 @@ type Props = {
   onLeadingIconTapped?: () => void;
   isLoading?: boolean;
 };
+
+function clickableProps(onClick?: () => void) {
+  if (!onClick) return {};
+  return {
+    role: "button",
+    tabIndex: 0,
+    onClick,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onClick();
+      }
+    },
+  };
+}
 
 export function ListItem({
   title,
@@ -46,13 +61,13 @@ export function ListItem({
   return (
     <div
       className="w-full flex items-center justify-between gap-3 px-4 py-3 border-b border-border-primary hover:bg-background-primary transition-colors cursor-pointer"
-      onClick={onTapped}
+      {...clickableProps(onTapped)}
     >
       <div className="flex flex-row items-center gap-3">
         {LeadingIcon && (
           <div
             className={`w-6 h-6 flex items-center justify-center rounded-full ${onLeadingIconTapped && "hover:bg-background-secondary transition-colors cursor-pointer"}`}
-            onClick={onLeadingIconTapped}
+            {...clickableProps(onLeadingIconTapped)}
           >
             <LeadingIcon className="w-5 h-5 text-label-secondary" />
           </div>
@@ -72,7 +87,7 @@ export function ListItem({
         {TrailingIcon && (
           <div
             className="w-6 h-6 flex items-center justify-center"
-            onClick={onLeadingIconTapped}
+            {...clickableProps(onLeadingIconTapped)}
           >
             <TrailingIcon className="w-5 h-5 text-label-secondary" />
           </div>

@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
 import { ExternalLinkIcon } from "lucide-react";
-import { api } from "@/lib/api";
+import type { Metadata } from "next";
 import { ListItem } from "@/components/dotto/list-item";
+import { api } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "お知らせ",
@@ -35,7 +35,8 @@ function relativeLabel(iso: string, now: Date): string | null {
   if (isSameDay(d, now)) return "今日";
   if (isSameDay(d, yesterday)) return "昨日";
   const diffDays = Math.floor(
-    (today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) /
+    (today.getTime() -
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) /
       86400000,
   );
   if (diffDays > 0 && diffDays < 7) return `${diffDays}日前`;

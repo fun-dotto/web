@@ -30,7 +30,7 @@ function formatDate(iso: string): { year: string; month: string; day: string } {
 }
 
 function periodLabel(period: string): string {
-  return period.replace("Period", "") + "限";
+  return `${period.replace("Period", "")}限`;
 }
 
 function typeLabel(type: LectureInfoType): string {
