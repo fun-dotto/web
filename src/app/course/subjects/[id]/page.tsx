@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { api } from "@/lib/api";
 import { PageHeaderTitle } from "@/contexts/page-header-context";
+import { api } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 

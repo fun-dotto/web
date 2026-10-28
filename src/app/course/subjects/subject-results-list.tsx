@@ -1,5 +1,5 @@
-import { ListItem } from "@/components/dotto/list-item";
 import Link from "next/link";
+import { ListItem } from "@/components/dotto/list-item";
 import { SEMESTER_LABEL, type Subject } from "./constants";
 
 export function SubjectResultsList({
@@ -19,13 +19,9 @@ export function SubjectResultsList({
     return (
       <ul>
         {[...Array(10)].map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: 並び替えのない固定数のスケルトン
           <li key={i}>
-            <ListItem
-              isLoading
-              title=""
-              description1=" "
-              description2=" "
-            />
+            <ListItem isLoading title="" description1=" " description2=" " />
           </li>
         ))}
       </ul>

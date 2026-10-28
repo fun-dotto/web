@@ -1,6 +1,10 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import DottoIcon from "@/assets/icon1024.png";
+import { navSections } from "@/components/layout/nav-sections";
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import DottoIcon from "@/assets/icon1024.png";
-import { navSections } from "@/components/layout/nav-sections";
+import { useAuth } from "@/contexts/auth-context";
 
 export function AppSidebar() {
   const { user, signOutUser } = useAuth();
@@ -81,6 +81,7 @@ export function AppSidebar() {
               {user?.displayName ?? user?.email}
             </span>
             <button
+              type="button"
               onClick={signOutUser}
               className="text-xs text-muted-foreground hover:text-foreground text-left transition-colors"
             >

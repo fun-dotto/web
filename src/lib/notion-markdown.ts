@@ -81,7 +81,7 @@ function blockToMarkdown(block: BlockObjectResponse): string {
 
 export function blocksToMarkdown(
   title: string,
-  blocks: BlockObjectResponse[]
+  blocks: BlockObjectResponse[],
 ): string {
   const body = blocks
     .map(blockToMarkdown)

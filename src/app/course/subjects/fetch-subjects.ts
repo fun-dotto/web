@@ -6,8 +6,8 @@ import {
   DAY_MAP,
   GRADE_MAP,
   REQUIRED_TYPE_MAP,
-  TERM_MAP,
   type Subject,
+  TERM_MAP,
 } from "./constants";
 
 export type SubjectsSearchParams = {
@@ -113,10 +113,7 @@ export async function fetchSubjectsAndSlots(
     {
       q: params.query || undefined,
       semesters: mapSet(params.selectedTerms, TERM_MAP),
-      requirementTypes: mapSet(
-        params.selectedRequiredTypes,
-        REQUIRED_TYPE_MAP,
-      ),
+      requirementTypes: mapSet(params.selectedRequiredTypes, REQUIRED_TYPE_MAP),
       classifications: mapSet(params.selectedCategories, CATEGORY_MAP),
       courses: mapSet(params.selectedCourses, COURSE_MAP),
       grades: mapSet(params.selectedGrades, GRADE_MAP),

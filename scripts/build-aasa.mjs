@@ -15,10 +15,7 @@ const source = path.join(
   wellKnownDirectory,
   `apple-app-site-association-${environment}`,
 );
-const destination = path.join(
-  wellKnownDirectory,
-  "apple-app-site-association",
-);
+const destination = path.join(wellKnownDirectory, "apple-app-site-association");
 
 if (!existsSync(source)) {
   throw new Error(`Missing apple-app-site-association source file: ${source}`);

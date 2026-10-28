@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-
-import { ListItem } from "./list-item";
 import { Plus, User } from "lucide-react";
+import { ListItem } from "./list-item";
 
 const meta = {
   title: "Dotto/ListItem",

@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { PageHeaderActions } from "@/contexts/page-header-context";
 import {
-  TERMS,
-  REQUIRED_TYPES,
   CATEGORIES,
-  COURSES,
-  GRADES,
-  CLASSES,
-  TERM_MAP,
-  REQUIRED_TYPE_MAP,
   CATEGORY_MAP,
+  CLASSES,
   COURSE_MAP,
+  COURSES,
   GRADE_MAP,
-  toggle,
+  GRADES,
+  REQUIRED_TYPE_MAP,
+  REQUIRED_TYPES,
   type Subject,
+  TERM_MAP,
+  TERMS,
+  toggle,
 } from "./constants";
 import { fetchSubjectsAndSlots } from "./fetch-subjects";
 import { FilterGroup, FilterSection } from "./filter-controls";
 import { SubjectResultsList } from "./subject-results-list";
-import { PageHeaderActions } from "@/contexts/page-header-context";
 
 const SESSION_STORAGE_KEY = "subjects-search-state";
 
@@ -94,9 +94,17 @@ function buildSearchParams({
 }): URLSearchParams {
   const params = new URLSearchParams();
   if (query) params.set(PARAM_KEYS.query, query);
-  const setEntries: [string, Set<string>, Record<string, string> | undefined][] = [
+  const setEntries: [
+    string,
+    Set<string>,
+    Record<string, string> | undefined,
+  ][] = [
     [PARAM_KEYS.selectedTerms, selectedTerms, TERM_MAP],
-    [PARAM_KEYS.selectedRequiredTypes, selectedRequiredTypes, REQUIRED_TYPE_MAP],
+    [
+      PARAM_KEYS.selectedRequiredTypes,
+      selectedRequiredTypes,
+      REQUIRED_TYPE_MAP,
+    ],
     [PARAM_KEYS.selectedCategories, selectedCategories, CATEGORY_MAP],
     [PARAM_KEYS.selectedCourses, selectedCourses, COURSE_MAP],
     [PARAM_KEYS.selectedGrades, selectedGrades, GRADE_MAP],
@@ -132,9 +140,7 @@ export default function SubjectsSearchView({
   const hasMatchingCache =
     !initialHasCondition && restored?.search === initialParams.toString();
 
-  const [query, setQuery] = useState(
-    initialParams.get(PARAM_KEYS.query) ?? "",
-  );
+  const [query, setQuery] = useState(initialParams.get(PARAM_KEYS.query) ?? "");
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(
     parseSet(initialParams, PARAM_KEYS.selectedTerms, TERM_REVERSE_MAP),
   );
@@ -252,6 +258,7 @@ export default function SubjectsSearchView({
     void runSearch(controller.signal);
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runSearch は毎レンダー再生成されるため依存に含めない
   useEffect(() => {
     const params = buildSearchParams({
       query,
@@ -374,6 +381,7 @@ export default function SubjectsSearchView({
       {(hasCondition || hasSearched) && (
         <PageHeaderActions>
           <button
+            type="button"
             onClick={clearAll}
             className="text-sm text-label-secondary hover:text-label-primary transition-colors"
           >

@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function SignInPage() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -34,10 +34,11 @@ export default function SignInPage() {
           続行するにはサインインしてください
         </p>
         <button
+          type="button"
           onClick={signInWithGoogle}
           className="flex w-full items-center justify-center gap-3 rounded-lg border border-border-primary bg-background-secondary px-4 py-3 text-sm font-medium text-label-secondary shadow-sm hover:bg-background-primary transition-colors"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
