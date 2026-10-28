@@ -56,10 +56,9 @@ export default async function SubjectsPage({
   return (
     <Suspense>
       <SubjectsSearchView
-        initialHasCondition={hasCondition}
-        initialHasError={initial?.hasError ?? false}
-        initialSubjects={initial?.subjects ?? []}
-        initialSlotEntries={initial?.slotEntries ?? []}
+        hasError={initial?.hasError ?? false}
+        subjects={initial?.subjects ?? []}
+        slotEntries={initial?.slotEntries ?? []}
       />
     </Suspense>
   );

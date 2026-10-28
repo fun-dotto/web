@@ -2,7 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { PageHeaderActions } from "@/contexts/page-header-context";
 import {
@@ -20,11 +20,8 @@ import {
   TERMS,
   toggle,
 } from "./constants";
-import { fetchSubjectsAndSlots } from "./fetch-subjects";
 import { FilterGroup, FilterSection } from "./filter-controls";
 import { SubjectResultsList } from "./subject-results-list";
-
-const SESSION_STORAGE_KEY = "subjects-search-state";
 
 const PARAM_KEYS = {
   query: "q",
@@ -45,23 +42,6 @@ const REQUIRED_TYPE_REVERSE_MAP = invertMap(REQUIRED_TYPE_MAP);
 const CATEGORY_REVERSE_MAP = invertMap(CATEGORY_MAP);
 const COURSE_REVERSE_MAP = invertMap(COURSE_MAP);
 const GRADE_REVERSE_MAP = invertMap(GRADE_MAP);
-
-type StoredState = {
-  search: string;
-  subjects: Subject[];
-  slotEntries: [string, string[]][];
-};
-
-function loadStoredState(): StoredState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as StoredState;
-  } catch {
-    return null;
-  }
-}
 
 function parseSet(
   params: URLSearchParams,
@@ -119,15 +99,13 @@ function buildSearchParams({
 }
 
 export default function SubjectsSearchView({
-  initialHasCondition,
-  initialHasError,
-  initialSubjects,
-  initialSlotEntries,
+  hasError,
+  subjects,
+  slotEntries,
 }: {
-  initialHasCondition: boolean;
-  initialHasError: boolean;
-  initialSubjects: Subject[];
-  initialSlotEntries: [string, string[]][];
+  hasError: boolean;
+  subjects: Subject[];
+  slotEntries: [string, string[]][];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -136,9 +114,8 @@ export default function SubjectsSearchView({
     new URLSearchParams(searchParams.toString()),
   ).current;
   const lastSyncedSearch = useRef(initialParams.toString());
-  const restored = useRef(loadStoredState()).current;
-  const hasMatchingCache =
-    !initialHasCondition && restored?.search === initialParams.toString();
+  const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const [query, setQuery] = useState(initialParams.get(PARAM_KEYS.query) ?? "");
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(
@@ -169,28 +146,7 @@ export default function SubjectsSearchView({
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(
     parseSet(initialParams, PARAM_KEYS.selectedClasses),
   );
-  const [subjects, setSubjects] = useState<Subject[]>(
-    initialHasCondition
-      ? initialSubjects
-      : hasMatchingCache
-        ? (restored?.subjects ?? [])
-        : [],
-  );
-  const [slotMap, setSlotMap] = useState<Map<string, string[]>>(
-    new Map(
-      initialHasCondition
-        ? initialSlotEntries
-        : hasMatchingCache
-          ? restored?.slotEntries
-          : undefined,
-    ),
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(initialHasError);
-  const [hasSearched, setHasSearched] = useState(initialHasCondition);
-  const skipNextFetch = useRef(initialHasCondition || hasMatchingCache);
-  const pendingAbort = useRef<AbortController | null>(null);
-  const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const slotMap = useMemo(() => new Map(slotEntries), [slotEntries]);
 
   const hasCondition =
     query.length > 0 ||
@@ -201,104 +157,7 @@ export default function SubjectsSearchView({
     selectedGrades.size > 0 ||
     selectedClasses.size > 0;
 
-  function clearAll() {
-    setQuery("");
-    setSelectedTerms(new Set());
-    setSelectedRequiredTypes(new Set());
-    setSelectedCategories(new Set());
-    setSelectedCourses(new Set());
-    setSelectedGrades(new Set());
-    setSelectedClasses(new Set());
-    setSubjects([]);
-    setSlotMap(new Map());
-    setHasSearched(false);
-    if (typeof window !== "undefined") {
-      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
-    }
-    router.replace(pathname, { scroll: false });
-  }
-
-  async function runSearch(signal: AbortSignal) {
-    setIsLoading(true);
-    setHasError(false);
-    try {
-      const result = await fetchSubjectsAndSlots(
-        {
-          query,
-          selectedTerms,
-          selectedRequiredTypes,
-          selectedCategories,
-          selectedCourses,
-          selectedGrades,
-          selectedClasses,
-        },
-        signal,
-      );
-      if (result.hasError) {
-        setHasError(true);
-      } else {
-        setSubjects(result.subjects);
-        setSlotMap(new Map(result.slotEntries));
-      }
-    } catch {
-      // abort によるキャンセルは無視する
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (pendingTimer.current) clearTimeout(pendingTimer.current);
-    pendingAbort.current?.abort();
-    skipNextFetch.current = false;
-    setHasSearched(true);
-    const controller = new AbortController();
-    pendingAbort.current = controller;
-    void runSearch(controller.signal);
-  }
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runSearch は毎レンダー再生成されるため依存に含めない
-  useEffect(() => {
-    const params = buildSearchParams({
-      query,
-      selectedTerms,
-      selectedRequiredTypes,
-      selectedCategories,
-      selectedCourses,
-      selectedGrades,
-      selectedClasses,
-    });
-    const search = params.toString();
-    const url = search ? `${pathname}?${search}` : pathname;
-    lastSyncedSearch.current = search;
-    router.replace(url, { scroll: false });
-
-    if (!hasCondition) {
-      return;
-    }
-
-    if (skipNextFetch.current) {
-      skipNextFetch.current = false;
-      return;
-    }
-
-    const controller = new AbortController();
-    pendingAbort.current = controller;
-
-    const timer = setTimeout(
-      () => {
-        void runSearch(controller.signal);
-      },
-      query ? 300 : 0,
-    );
-    pendingTimer.current = timer;
-
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [
+  const search = buildSearchParams({
     query,
     selectedTerms,
     selectedRequiredTypes,
@@ -306,11 +165,51 @@ export default function SubjectsSearchView({
     selectedCourses,
     selectedGrades,
     selectedClasses,
-    hasCondition,
-    pathname,
-    router,
-  ]);
+  }).toString();
 
+  // 検索条件を URL に反映し、Server Component 側で検索結果を再取得させる
+  function navigate(nextSearch: string) {
+    lastSyncedSearch.current = nextSearch;
+    const url = nextSearch ? `${pathname}?${nextSearch}` : pathname;
+    startTransition(() => {
+      router.replace(url, { scroll: false });
+    });
+  }
+
+  function clearAll() {
+    if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    setQuery("");
+    setSelectedTerms(new Set());
+    setSelectedRequiredTypes(new Set());
+    setSelectedCategories(new Set());
+    setSelectedCourses(new Set());
+    setSelectedGrades(new Set());
+    setSelectedClasses(new Set());
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    if (search === searchParams.toString()) {
+      startTransition(() => {
+        router.refresh();
+      });
+      return;
+    }
+    navigate(search);
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: navigate は毎レンダー再生成されるため依存に含めない
+  useEffect(() => {
+    if (search === lastSyncedSearch.current) {
+      return;
+    }
+    const timer = setTimeout(() => navigate(search), query ? 300 : 0);
+    pendingTimer.current = timer;
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: clearAll は毎レンダー再生成されるため依存に含めない
   useEffect(() => {
     const currentSearch = searchParams.toString();
     if (currentSearch === lastSyncedSearch.current) {
@@ -322,63 +221,12 @@ export default function SubjectsSearchView({
     }
     // サイドバーの「科目検索」リンクなど、自分の router.replace 以外の
     // 要因でクエリパラメータが空になった場合は検索条件をリセットする
-    pendingTimer.current && clearTimeout(pendingTimer.current);
-    pendingAbort.current?.abort();
-    skipNextFetch.current = false;
-    setQuery("");
-    setSelectedTerms(new Set());
-    setSelectedRequiredTypes(new Set());
-    setSelectedCategories(new Set());
-    setSelectedCourses(new Set());
-    setSelectedGrades(new Set());
-    setSelectedClasses(new Set());
-    setSubjects([]);
-    setSlotMap(new Map());
-    setHasSearched(false);
-    if (typeof window !== "undefined") {
-      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
-    }
+    clearAll();
   }, [searchParams]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!hasCondition) {
-      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      return;
-    }
-    const search = buildSearchParams({
-      query,
-      selectedTerms,
-      selectedRequiredTypes,
-      selectedCategories,
-      selectedCourses,
-      selectedGrades,
-      selectedClasses,
-    }).toString();
-    const stored: StoredState = {
-      search,
-      subjects,
-      slotEntries: [...slotMap.entries()],
-    };
-    window.sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(stored));
-  }, [
-    query,
-    selectedTerms,
-    selectedRequiredTypes,
-    selectedCategories,
-    selectedCourses,
-    selectedGrades,
-    selectedClasses,
-    subjects,
-    slotMap,
-    hasCondition,
-  ]);
-
-  const displaySubjects = hasCondition || hasSearched ? subjects : [];
 
   return (
     <div className="flex flex-col @[768px]:flex-row items-stretch @[768px]:items-start gap-4 h-[calc(100svh-6rem)] min-h-0 max-w-5xl mx-auto">
-      {(hasCondition || hasSearched) && (
+      {hasCondition && (
         <PageHeaderActions>
           <button
             type="button"
@@ -455,10 +303,10 @@ export default function SubjectsSearchView({
       <div className="flex-1 min-w-0 h-full min-h-0 overflow-y-auto">
         {/* 検索結果 */}
         <SubjectResultsList
-          isLoading={isLoading}
-          hasError={hasError}
-          hasCondition={hasCondition || hasSearched}
-          subjects={displaySubjects}
+          isLoading={isPending}
+          hasError={hasCondition && hasError}
+          hasCondition={hasCondition}
+          subjects={hasCondition ? subjects : []}
           slotMap={slotMap}
         />
       </div>
