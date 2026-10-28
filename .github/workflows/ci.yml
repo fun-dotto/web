@@ -55,4 +55,4 @@ jobs:
           github_token: ${{ github.token }}
           cache: true
       - run: pnpm install
-      - run: pnpm ci
+      - run: pnpm ci-check
