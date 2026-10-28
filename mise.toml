@@ -14,9 +14,3 @@ run = [
 
 [tasks.rulesync]
 run = "rulesync generate"
-
-[tasks.build]
-run = "pnpm build"
-
-[tasks.lint]
-run = "pnpm lint"

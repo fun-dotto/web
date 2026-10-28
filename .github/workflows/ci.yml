@@ -32,8 +32,8 @@ jobs:
         with:
           github_token: ${{ github.token }}
           cache: true
-      - run: mise run bootstrap
-      - run: mise run build
+      - run: pnpm install
+      - run: pnpm build
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
@@ -54,5 +54,5 @@ jobs:
         with:
           github_token: ${{ github.token }}
           cache: true
-      - run: mise run bootstrap
-      - run: mise run lint
+      - run: pnpm install
+      - run: pnpm ci
