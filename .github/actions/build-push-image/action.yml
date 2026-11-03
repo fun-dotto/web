@@ -1,12 +1,6 @@
 name: Build and Push Image
-description: 環境ごとのビルド引数で Docker イメージをビルドし、コミット SHA と latest のタグで Artifact Registry に push する
+description: Docker イメージをビルドし、コミット SHA のタグで Artifact Registry に push する
 inputs:
-  image_name:
-    description: タグなしの Docker イメージ参照（環境ごとに分ける）
-    required: true
-  environment:
-    description: ビルド対象の環境（dev, stg, prd）
-    required: true
   ar_hostname:
     description: Artifact Registry のホスト名
     required: true
@@ -19,53 +13,27 @@ inputs:
   service_account:
     description: 借用するサービスアカウント
     required: true
-  firebase_api_key:
-    required: true
-  firebase_auth_domain:
-    required: true
-  firebase_project_id:
-    required: true
-  firebase_storage_bucket:
-    required: true
-  firebase_messaging_sender_id:
-    required: true
-  firebase_app_id:
-    required: true
-  firebase_measurement_id:
+  tag_latest:
+    description: latest タグも付与して push するか
     required: false
-  firebase_appcheck_site_key:
-    required: false
+    default: "false"
 runs:
   using: composite
   steps:
+    - id: set-image
+      shell: bash
+      run: |
+        REPO_NAME=$(echo ${{ github.repository }} | awk -F '/' '{print $2}')
+        # イメージは環境ごとに分けず、1 つのイメージをタグで管理する。
+        echo "image_name=${{ inputs.ar_hostname }}/${{ inputs.project_id }}/github-actions/$REPO_NAME" >> "$GITHUB_OUTPUT"
     - name: Build
       shell: bash
-      env:
-        DOTTO_ENV: ${{ inputs.environment }}
-        NEXT_PUBLIC_FIREBASE_API_KEY: ${{ inputs.firebase_api_key }}
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ inputs.firebase_auth_domain }}
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ inputs.firebase_project_id }}
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ inputs.firebase_storage_bucket }}
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ inputs.firebase_messaging_sender_id }}
-        NEXT_PUBLIC_FIREBASE_APP_ID: ${{ inputs.firebase_app_id }}
-        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ inputs.firebase_measurement_id }}
-        NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY: ${{ inputs.firebase_appcheck_site_key }}
-      # 値を省略した --build-arg は同名の環境変数から渡される。
       run: |
         docker build \
-        -t ${{ inputs.image_name }}:${{ github.sha }} \
+        -t ${{ steps.set-image.outputs.image_name }}:${{ github.sha }} \
         . \
         -f Dockerfile \
-        --no-cache \
-        --build-arg DOTTO_ENV \
-        --build-arg NEXT_PUBLIC_FIREBASE_API_KEY \
-        --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN \
-        --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID \
-        --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET \
-        --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID \
-        --build-arg NEXT_PUBLIC_FIREBASE_APP_ID \
-        --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID \
-        --build-arg NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY
+        --no-cache
     - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
@@ -83,14 +51,14 @@ runs:
       shell: bash
       run: |
         docker push \
-        ${{ inputs.image_name }}:${{ github.sha }}
+        ${{ steps.set-image.outputs.image_name }}:${{ github.sha }}
     # SHA タグの push が成功した場合のみ latest を更新する。
-    # イメージは環境ごとに分かれているため、latest はその環境の最新ビルドを指す。
-    - name: Push latest
+    - if: inputs.tag_latest == 'true'
+      name: Push latest
       shell: bash
       run: |
         docker tag \
-        ${{ inputs.image_name }}:${{ github.sha }} \
-        ${{ inputs.image_name }}:latest
+        ${{ steps.set-image.outputs.image_name }}:${{ github.sha }} \
+        ${{ steps.set-image.outputs.image_name }}:latest
         docker push \
-        ${{ inputs.image_name }}:latest
+        ${{ steps.set-image.outputs.image_name }}:latest

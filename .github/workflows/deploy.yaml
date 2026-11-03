@@ -1,7 +1,6 @@
 name: Deploy
 
-# main への push: stg 向けにビルドして latest を更新し、stg へデプロイする。
-# イメージは NEXT_PUBLIC_* を埋め込むため環境ごとに分かれる。
+# main への push: ビルドして latest を更新し、stg へデプロイする。
 # 手動実行: action で実行範囲を選択する。
 on:
   push:
@@ -19,7 +18,7 @@ on:
           - build-push
           - deploy
       environment_name:
-        description: 対象の環境（prd は build-push / deploy でのみ指定可）
+        description: デプロイ先の環境（build-push では無視、prd は deploy でのみ指定可）
         required: true
         type: choice
         options:
@@ -47,13 +46,12 @@ jobs:
       environment: ${{ steps.set-env.outputs.environment }}
       service_name: ${{ steps.set-env.outputs.service_name }}
       image_tag: ${{ steps.set-env.outputs.image_tag }}
-      image_name: ${{ steps.image-name.outputs.image_name }}
     steps:
-      # prd へは、ビルド済みのイメージタグを指定する deploy でのみデプロイする。
+      # prd へは、検証済みのイメージタグを指定する deploy でのみデプロイする。
       - if: inputs.action == 'build-push-deploy' && inputs.environment_name == 'prd'
         name: Reject prd
         run: |
-          echo "prd は action: build-push または deploy でのみ指定できます" >&2
+          echo "prd は action: deploy でのみ指定できます" >&2
           exit 1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: set-env
@@ -62,36 +60,22 @@ jobs:
           ar_hostname: ${{ vars._AR_HOSTNAME }}
           project_id: ${{ vars.PROJECT_ID }}
           image_tag: ${{ inputs.action == 'deploy' && (inputs.image_tag || 'latest') || github.sha }}
-      - id: image-name
-        run: |
-          IMAGE_TAG="${{ steps.set-env.outputs.image_tag }}"
-          echo "image_name=${IMAGE_TAG%:*}" >> "$GITHUB_OUTPUT"
 
   build-and-push:
     if: inputs.action != 'deploy'
     runs-on: ubuntu-latest
-    # 環境ごとの Secrets をビルド引数に使う。
-    environment: ${{ needs.set-env.outputs.environment }}
     needs:
       - set-env
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/build-push-image
         with:
-          image_name: ${{ needs.set-env.outputs.image_name }}
-          environment: ${{ needs.set-env.outputs.environment }}
           ar_hostname: ${{ vars._AR_HOSTNAME }}
           project_id: ${{ vars.PROJECT_ID }}
           workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.SERVICE_ACCOUNT }}
-          firebase_api_key: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          firebase_auth_domain: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          firebase_project_id: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          firebase_storage_bucket: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          firebase_messaging_sender_id: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          firebase_app_id: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-          firebase_measurement_id: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
-          firebase_appcheck_site_key: ${{ secrets.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY }}
+          # latest は main への push でのみ更新する。
+          tag_latest: ${{ github.event_name == 'push' }}
 
   deploy:
     # build-and-push がスキップされた場合もデプロイするため、結果を明示的に判定する。
@@ -114,3 +98,14 @@ jobs:
           region: ${{ vars._DEPLOY_REGION }}
           workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.SERVICE_ACCOUNT }}
+          # 環境ごとの設定は実行時の環境変数として Cloud Run に渡す。
+          env_vars: |
+            DOTTO_ENV=${{ needs.set-env.outputs.environment }}
+            FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+            FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+            FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+            FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+            FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+            FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+            FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+            FIREBASE_APPCHECK_SITE_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY }}

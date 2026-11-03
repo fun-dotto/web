@@ -19,7 +19,7 @@ outputs:
     description: Cloud Run のサービス名（prd はサフィックスなし）
     value: ${{ steps.set-env.outputs.service_name }}
   image_tag:
-    description: Docker イメージのタグ付き参照（環境ごとに分ける）
+    description: Docker イメージのタグ付き参照（環境ごとに分けない）
     value: ${{ steps.set-env.outputs.image_tag }}
 runs:
   using: composite
@@ -49,8 +49,8 @@ runs:
 
         export REPO_NAME=$(echo ${{ github.repository }} | awk -F '/' '{print $2}')
         export SERVICE_NAME=$REPO_NAME$SERVICE_NAME_SUFFIX
-        # NEXT_PUBLIC_* などをビルド時に埋め込むため、イメージは環境ごとに分ける。
-        export IMAGE_TAG=${{ inputs.ar_hostname }}/${{ inputs.project_id }}/github-actions/$REPO_NAME/$SERVICE_NAME:${{ inputs.image_tag }}
+        # イメージは環境ごとに分けず、全環境で同じイメージをタグで指定する。
+        export IMAGE_TAG=${{ inputs.ar_hostname }}/${{ inputs.project_id }}/github-actions/$REPO_NAME:${{ inputs.image_tag }}
 
         echo "Repository name: $REPO_NAME"
         echo "Service name: $SERVICE_NAME"
