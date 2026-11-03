@@ -1,7 +1,12 @@
+import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { ExternalLinkIcon } from "lucide-react";
 import type { Metadata } from "next";
+import {
+  type Announcement,
+  AnnouncementService,
+} from "@/api/app/v1/announcement_pb";
 import { ListItem } from "@/components/dotto/list-item";
-import { api } from "@/lib/api";
+import { apiClient } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "お知らせ",
@@ -10,8 +15,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-function formatDate(iso: string): { year: string; month: string; day: string } {
-  const d = new Date(iso);
+function formatDate(d: Date): { year: string; month: string; day: string } {
   return {
     year: String(d.getFullYear()),
     month: String(d.getMonth() + 1).padStart(2, "0"),
@@ -27,8 +31,7 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-function relativeLabel(iso: string, now: Date): string | null {
-  const d = new Date(iso);
+function relativeLabel(d: Date, now: Date): string | null {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -44,25 +47,35 @@ function relativeLabel(iso: string, now: Date): string | null {
 }
 
 export default async function Page() {
-  const { data, error } = await api.GET("/v1/announcements");
+  let announcements: Announcement[] | undefined;
+  try {
+    ({ announcements } = await apiClient(AnnouncementService).listAnnouncements(
+      {},
+    ));
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <div>
-      {error || !data ? (
+      {!announcements ? (
         <div className="py-20 text-center">
           <p className="text-accent-error text-sm">
             お知らせの取得に失敗しました。
           </p>
         </div>
-      ) : data.announcements.length === 0 ? (
+      ) : announcements.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-label-secondary text-sm">お知らせはありません</p>
         </div>
       ) : (
         <ul className="max-w-3xl mx-auto">
-          {data.announcements.map((announcement) => {
-            const { year, month, day } = formatDate(announcement.date);
-            const relative = relativeLabel(announcement.date, new Date());
+          {announcements.map((announcement) => {
+            const date = announcement.availableFrom
+              ? timestampDate(announcement.availableFrom)
+              : new Date(0);
+            const { year, month, day } = formatDate(date);
+            const relative = relativeLabel(date, new Date());
 
             return (
               <li key={announcement.id}>

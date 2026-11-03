@@ -1,36 +1,61 @@
-import createClient, { type Middleware } from "openapi-fetch";
-import type { paths } from "@/types/api";
+import type { DescService } from "@bufbuild/protobuf";
+import {
+  type Client,
+  createClient,
+  type Interceptor,
+} from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-node";
+import { getServiceIdToken } from "@/lib/service-id-token";
 
-const authMiddleware: Middleware = {
-  async onRequest({ request }) {
-    const { cookies } = await import("next/headers");
-    const cookieStore = await cookies();
-    const token = cookieStore.get("firebase-id-token")?.value;
-    if (token) {
-      request.headers.set("Authorization", `Bearer ${token}`);
-    }
-    return request;
-  },
+/**
+ * Web のサービスアカウントの Google ID トークンを付与する。
+ * App API はこれで呼び出し元を確かめ、App Check の検証を省略する。
+ * Authorization はユーザーの Firebase ID トークンに使うため、X-Service-Authorization に入れる。
+ */
+const serviceAuthInterceptor =
+  (audience: string): Interceptor =>
+  (next) =>
+  async (req) => {
+    req.header.set(
+      "X-Service-Authorization",
+      await getServiceIdToken(audience),
+    );
+    return next(req);
+  };
+
+/**
+ * ユーザーの Firebase ID トークンを Cookie から読み出し、App API へのリクエストに付与する。
+ */
+const firebaseInterceptor: Interceptor = (next) => async (req) => {
+  const { cookies } = await import("next/headers");
+  const cookieStore = await cookies();
+  const idToken = cookieStore.get("firebase-id-token")?.value;
+  if (idToken) {
+    req.header.set("Authorization", `Bearer ${idToken}`);
+  }
+  return next(req);
 };
 
-const appCheckMiddleware: Middleware = {
-  async onRequest({ request }) {
-    const { cookies } = await import("next/headers");
-    const cookieStore = await cookies();
-    const token = cookieStore.get("firebase-app-check-token")?.value;
-    if (token) {
-      request.headers.set("X-Firebase-AppCheck", token);
+let transport: ReturnType<typeof createConnectTransport> | undefined;
+
+function getTransport() {
+  if (!transport) {
+    const baseUrl = process.env.APP_API_URL;
+    if (!baseUrl) {
+      throw new Error("APP_API_URL が設定されていません");
     }
-    return request;
-  },
-};
+    transport = createConnectTransport({
+      baseUrl,
+      httpVersion: "1.1",
+      interceptors: [serviceAuthInterceptor(baseUrl), firebaseInterceptor],
+    });
+  }
+  return transport;
+}
 
-export const api = createClient<paths>({
-  baseUrl: process.env.API_BASE_URL,
-  querySerializer: {
-    array: { style: "form", explode: false },
-  },
-});
-
-api.use(appCheckMiddleware);
-api.use(authMiddleware);
+/**
+ * App API のクライアントを返す。サーバー側でのみ利用する。
+ */
+export function apiClient<T extends DescService>(service: T): Client<T> {
+  return createClient(service, getTransport());
+}

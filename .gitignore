@@ -44,9 +44,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated from openapi/openapi.yaml
-/src/types/api.d.ts
-
 
 **/AGENTS.md
 **/CLAUDE.md

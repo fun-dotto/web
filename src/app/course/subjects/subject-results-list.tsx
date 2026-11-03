@@ -61,7 +61,7 @@ export function SubjectResultsList({
             : primaryFaculty.name
           : undefined;
         const infoLabel = [
-          SEMESTER_LABEL[subject.semester] ?? subject.semester,
+          SEMESTER_LABEL[subject.semester],
           slotMap.get(subject.id)?.join(","),
           `${subject.credit}単位`,
         ]
