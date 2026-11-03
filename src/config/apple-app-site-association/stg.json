@@ -2,9 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": [
-          "64LEQXTB98.jp.ac.fun.dotto.dev"
-        ],
+        "appIDs": ["64LEQXTB98.jp.ac.fun.dotto.stg"],
         "components": [
           {
             "#": "no_universal_links",
@@ -31,8 +29,6 @@
     ]
   },
   "webcredentials": {
-    "apps": [
-      "64LEQXTB98.jp.ac.fun.dotto.dev"
-    ]
+    "apps": ["64LEQXTB98.jp.ac.fun.dotto.stg"]
   }
 }

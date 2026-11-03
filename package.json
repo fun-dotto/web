@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "generate:api": "openapi-typescript openapi/openapi.yaml -o src/types/api.d.ts",
-    "build:aasa": "node scripts/build-aasa.mjs",
-    "prebuild": "pnpm generate:api && pnpm build:aasa",
+    "prebuild": "pnpm generate:api",
     "build": "next build",
     "start": "next start",
     "check": "biome check",
