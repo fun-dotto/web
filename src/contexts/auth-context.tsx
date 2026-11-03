@@ -8,7 +8,7 @@ import {
   type User,
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/lib/firebase";
+import { type FirebaseClientConfig, getFirebaseClient } from "@/lib/firebase";
 
 type AuthContextType = {
   user: User | null;
@@ -19,12 +19,12 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-async function getAppCheckToken(): Promise<string | undefined> {
-  const [{ appCheck }, { getToken }] = await Promise.all([
-    import("@/lib/firebase"),
-    import("firebase/app-check"),
-  ]);
+async function getAppCheckToken(
+  config: FirebaseClientConfig,
+): Promise<string | undefined> {
+  const { appCheck } = getFirebaseClient(config);
   if (!appCheck) return undefined;
+  const { getToken } = await import("firebase/app-check");
   try {
     const { token } = await getToken(appCheck, false);
     return token;
@@ -33,11 +33,14 @@ async function getAppCheckToken(): Promise<string | undefined> {
   }
 }
 
-async function syncSessionCookie(user: User | null) {
+async function syncSessionCookie(
+  user: User | null,
+  config: FirebaseClientConfig,
+) {
   if (user) {
     const [idToken, appCheckToken] = await Promise.all([
       user.getIdToken(),
-      getAppCheckToken(),
+      getAppCheckToken(config),
     ]);
     await fetch("/api/auth/session", {
       method: "POST",
@@ -49,26 +52,33 @@ async function syncSessionCookie(user: User | null) {
   }
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  firebaseConfig,
+  children,
+}: {
+  firebaseConfig: FirebaseClientConfig;
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const { auth } = getFirebaseClient(firebaseConfig);
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      await syncSessionCookie(user);
+      await syncSessionCookie(user, firebaseConfig);
       setUser(user);
       setLoading(false);
     });
     return unsubscribe;
-  }, []);
+  }, [firebaseConfig]);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithPopup(getFirebaseClient(firebaseConfig).auth, provider);
   };
 
   const signOutUser = async () => {
-    await signOut(auth);
+    await signOut(getFirebaseClient(firebaseConfig).auth);
   };
 
   return (

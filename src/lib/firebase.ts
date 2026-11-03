@@ -1,28 +1,36 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
+import { type FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import {
   type AppCheck,
   initializeAppCheck,
   ReCaptchaV3Provider,
 } from "firebase/app-check";
-import { getAuth } from "firebase/auth";
+import { type Auth, getAuth } from "firebase/auth";
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+/** サーバーで実行時の環境変数から組み立て、クライアントに渡す Firebase の設定 */
+export type FirebaseClientConfig = {
+  apiKey?: string;
+  authDomain?: string;
+  projectId?: string;
+  storageBucket?: string;
+  messagingSenderId?: string;
+  appId?: string;
+  appCheckSiteKey?: string;
+  appCheckDebugToken?: string;
 };
 
-const appCheckSiteKey = process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY;
-const appCheckDebugToken =
-  process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN;
+type FirebaseClient = {
+  app: FirebaseApp;
+  auth: Auth;
+  appCheck: AppCheck | undefined;
+};
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let client: FirebaseClient | undefined;
 
-const initializeClientAppCheck = (): AppCheck | undefined => {
-  if (typeof window === "undefined" || !appCheckSiteKey) {
+const initializeClientAppCheck = (
+  app: FirebaseApp,
+  config: FirebaseClientConfig,
+): AppCheck | undefined => {
+  if (typeof window === "undefined" || !config.appCheckSiteKey) {
     return undefined;
   }
 
@@ -35,14 +43,14 @@ const initializeClientAppCheck = (): AppCheck | undefined => {
     return appCheckGlobal.__FIREBASE_APP_CHECK__;
   }
 
-  if (appCheckDebugToken) {
+  if (config.appCheckDebugToken) {
     appCheckGlobal.FIREBASE_APPCHECK_DEBUG_TOKEN =
-      appCheckDebugToken === "true" ? true : appCheckDebugToken;
+      config.appCheckDebugToken === "true" ? true : config.appCheckDebugToken;
   }
 
   try {
     const instance = initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(appCheckSiteKey),
+      provider: new ReCaptchaV3Provider(config.appCheckSiteKey),
       isTokenAutoRefreshEnabled: true,
     });
     appCheckGlobal.__FIREBASE_APP_CHECK__ = instance;
@@ -52,6 +60,21 @@ const initializeClientAppCheck = (): AppCheck | undefined => {
   }
 };
 
-export const appCheck = initializeClientAppCheck();
+/** 渡された設定で Firebase を一度だけ初期化する（クライアント専用） */
+export function getFirebaseClient(
+  config: FirebaseClientConfig,
+): FirebaseClient {
+  if (client) return client;
 
-export const auth = getAuth(app);
+  const { appCheckSiteKey, appCheckDebugToken, ...options } = config;
+  const app = getApps().length === 0 ? initializeApp(options) : getApp();
+  client = {
+    app,
+    auth: getAuth(app),
+    appCheck: initializeClientAppCheck(app, {
+      appCheckSiteKey,
+      appCheckDebugToken,
+    }),
+  };
+  return client;
+}

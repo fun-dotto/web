@@ -32,9 +32,6 @@
     ]
   },
   "webcredentials": {
-    "apps": [
-      "64LEQXTB98.jp.ac.fun.dotto",
-      "64LEQXTB98.jp.ac.fun.dotto.prd"
-    ]
+    "apps": ["64LEQXTB98.jp.ac.fun.dotto", "64LEQXTB98.jp.ac.fun.dotto.prd"]
   }
 }
