@@ -4,7 +4,7 @@
   "files": {
     "includes": [
       "**",
-      "!src/types/api.d.ts",
+      "!src/api",
       "!next-env.d.ts",
       "!**/*.css",
       "!**/*.yaml",
