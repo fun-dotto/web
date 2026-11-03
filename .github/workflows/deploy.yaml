@@ -96,14 +96,3 @@ jobs:
           image: ${{ needs.set-env.outputs.image_tag }}
           region: ${{ vars._DEPLOY_REGION }}
           workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
-          # 環境ごとの設定は実行時の環境変数として Cloud Run に渡す。
-          env_vars: |
-            DOTTO_ENV=${{ needs.set-env.outputs.environment }}
-            FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-            FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-            FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-            FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-            FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-            FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-            FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
-            FIREBASE_APPCHECK_SITE_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY }}

@@ -10,10 +10,6 @@ inputs:
   region:
     description: デプロイ先のリージョン
     required: true
-  env_vars:
-    description: Cloud Run に設定する環境変数（KEY=VALUE を改行区切り）
-    required: false
-    default: ""
   workload_identity_provider:
     description: Workload Identity プロバイダ
     required: true
@@ -28,4 +24,3 @@ runs:
         service: ${{ inputs.service }}
         image: ${{ inputs.image }}
         region: ${{ inputs.region }}
-        env_vars: ${{ inputs.env_vars }}
