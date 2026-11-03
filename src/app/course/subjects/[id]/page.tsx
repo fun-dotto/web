@@ -1,9 +1,32 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import { type Subject, SubjectService } from "@/api/app/v1/subject_pb";
 import { PageHeaderTitle } from "@/contexts/page-header-context";
-import { api } from "@/lib/api";
+import { apiClient } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
+
+type GetSubjectResult =
+  | { status: "ok"; subject: Subject }
+  | { status: "notFound" }
+  | { status: "error" };
+
+// generateMetadata と Page で同じリクエストを共有する
+const getSubject = cache(async (id: string): Promise<GetSubjectResult> => {
+  try {
+    const { subject } = await apiClient(SubjectService).getSubject({ id });
+    if (!subject) return { status: "notFound" };
+    return { status: "ok", subject };
+  } catch (error) {
+    if (ConnectError.from(error).code === Code.NotFound) {
+      return { status: "notFound" };
+    }
+    console.error(error);
+    return { status: "error" };
+  }
+});
 
 export async function generateMetadata({
   params,
@@ -12,11 +35,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
 
-  const { data } = await api.GET("/v1/subjects/{id}", {
-    params: { path: { id } },
-  });
+  const result = await getSubject(id);
 
-  return { title: data?.subject.name ?? "科目詳細" };
+  return { title: result.status === "ok" ? result.subject.name : "科目詳細" };
 }
 
 type DetailRow = {
@@ -43,13 +64,11 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  const { data, error, response } = await api.GET("/v1/subjects/{id}", {
-    params: { path: { id } },
-  });
+  const result = await getSubject(id);
 
-  if (response.status === 404) notFound();
+  if (result.status === "notFound") notFound();
 
-  if (error || !data) {
+  if (result.status === "error") {
     return (
       <div className="py-20 text-center">
         <p className="text-accent-error text-sm">情報の取得に失敗しました。</p>
@@ -57,27 +76,27 @@ export default async function Page({
     );
   }
 
-  const { name, syllabus } = data.subject;
+  const { name, syllabus } = result.subject;
 
   const rows: DetailRow[] = [
-    { label: "概要", value: syllabus.summary },
-    { label: "到達目標", value: syllabus.learningOutcomes },
-    { label: "提出課題等", value: syllabus.assignments },
-    { label: "評価方法・基準", value: syllabus.evaluationMethod },
-    { label: "テキスト", value: syllabus.textbooks },
-    { label: "参考書", value: syllabus.referenceBooks },
-    { label: "履修条件", value: syllabus.prerequisites },
-    { label: "事前学習", value: syllabus.preLearning },
-    { label: "事後学習", value: syllabus.postLearning },
-    { label: "履修上の留意点", value: syllabus.notes },
-    { label: "キーワード", value: syllabus.keywords },
-    { label: "対象コース・領域", value: syllabus.targetCourses },
-    { label: "対象領域", value: syllabus.targetAreas },
-    { label: "科目群・科目区分", value: syllabus.classifications },
-    { label: "教授言語", value: syllabus.teachingLanguage },
-    { label: "授業内容とスケジュール", value: syllabus.contentsAndSchedule },
-    { label: "授業・試験の形式", value: syllabus.teachingAndExamForm },
-    { label: "DSOP対象科目", value: syllabus.dsopSubject },
+    { label: "概要", value: syllabus?.summary },
+    { label: "到達目標", value: syllabus?.learningOutcomes },
+    { label: "提出課題等", value: syllabus?.assignments },
+    { label: "評価方法・基準", value: syllabus?.evaluationMethod },
+    { label: "テキスト", value: syllabus?.textbooks },
+    { label: "参考書", value: syllabus?.referenceBooks },
+    { label: "履修条件", value: syllabus?.prerequisites },
+    { label: "事前学習", value: syllabus?.preLearning },
+    { label: "事後学習", value: syllabus?.postLearning },
+    { label: "履修上の留意点", value: syllabus?.notes },
+    { label: "キーワード", value: syllabus?.keywords },
+    { label: "対象コース・領域", value: syllabus?.targetCourses },
+    { label: "対象領域", value: syllabus?.targetAreas },
+    { label: "科目群・科目区分", value: syllabus?.classifications },
+    { label: "教授言語", value: syllabus?.teachingLanguage },
+    { label: "授業内容とスケジュール", value: syllabus?.contentsAndSchedule },
+    { label: "授業・試験の形式", value: syllabus?.teachingAndExamForm },
+    { label: "DSOP対象科目", value: syllabus?.dsopSubject },
   ];
 
   return (

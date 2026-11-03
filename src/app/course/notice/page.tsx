@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { api } from "@/lib/api";
+import { CancelledClassService } from "@/api/app/v1/cancelled_class_pb";
+import { MakeupClassService } from "@/api/app/v1/makeup_class_pb";
+import { RoomChangeService } from "@/api/app/v1/room_change_pb";
+import { apiClient } from "@/lib/api";
+import { protoDateToIsoString } from "@/lib/proto-date";
 
 export const metadata: Metadata = {
   title: "休講・補講・教室変更",
@@ -15,7 +19,7 @@ type LectureInfoItem = {
   id: string;
   type: LectureInfoType;
   date: string;
-  period: string;
+  period: number;
   subjectName: string;
   detail: string;
 };
@@ -29,8 +33,8 @@ function formatDate(iso: string): { year: string; month: string; day: string } {
   };
 }
 
-function periodLabel(period: string): string {
-  return `${period.replace("Period", "")}限`;
+function periodLabel(period: number): string {
+  return `${period}限`;
 }
 
 function typeLabel(type: LectureInfoType): string {
@@ -70,20 +74,16 @@ function sectionId(type: LectureInfoType): string {
 }
 
 export default async function Page() {
-  const [cancelledRes, makeupRes, roomChangeRes] = await Promise.all([
-    api.GET("/v1/cancelledClasses"),
-    api.GET("/v1/makeupClasses"),
-    api.GET("/v1/roomChanges"),
-  ]);
-
-  const hasError = !!(
-    cancelledRes.error ||
-    makeupRes.error ||
-    roomChangeRes.error ||
-    !cancelledRes.data ||
-    !makeupRes.data ||
-    !roomChangeRes.data
-  );
+  const results = await Promise.all([
+    apiClient(CancelledClassService).listCancelledClasses({}),
+    apiClient(MakeupClassService).listMakeupClasses({}),
+    apiClient(RoomChangeService).listRoomChanges({}),
+  ]).catch((error: unknown) => {
+    console.error(error);
+    return undefined;
+  });
+  const hasError = !results;
+  const [cancelledRes, makeupRes, roomChangeRes] = results ?? [];
 
   const now = new Date();
   const todayStart = new Date(
@@ -94,13 +94,13 @@ export default async function Page() {
 
   const cancelledItems: LectureInfoItem[] = hasError
     ? []
-    : cancelledRes.data.cancelledClasses
+    : (cancelledRes?.cancelledClasses ?? [])
         .map((item) => ({
           id: item.id,
           type: "Cancelled" as const,
-          date: item.date,
+          date: protoDateToIsoString(item.date),
           period: item.period,
-          subjectName: item.subject.name,
+          subjectName: item.subject?.name ?? "",
           detail: item.comment,
         }))
         .filter((item) => isTodayOrLater(item.date, todayStart))
@@ -108,13 +108,13 @@ export default async function Page() {
 
   const makeupItems: LectureInfoItem[] = hasError
     ? []
-    : makeupRes.data.makeupClasses
+    : (makeupRes?.makeupClasses ?? [])
         .map((item) => ({
           id: item.id,
           type: "Makeup" as const,
-          date: item.date,
+          date: protoDateToIsoString(item.date),
           period: item.period,
-          subjectName: item.subject.name,
+          subjectName: item.subject?.name ?? "",
           detail: item.comment,
         }))
         .filter((item) => isTodayOrLater(item.date, todayStart))
@@ -122,14 +122,14 @@ export default async function Page() {
 
   const roomChangedItems: LectureInfoItem[] = hasError
     ? []
-    : roomChangeRes.data.roomChanges
+    : (roomChangeRes?.roomChanges ?? [])
         .map((item) => ({
           id: item.id,
           type: "RoomChanged" as const,
-          date: item.date,
+          date: protoDateToIsoString(item.date),
           period: item.period,
-          subjectName: item.subject.name,
-          detail: `${item.originalRoom.name} → ${item.newRoom.name}`,
+          subjectName: item.subject?.name ?? "",
+          detail: `${item.originalRoom?.name ?? ""} → ${item.newRoom?.name ?? ""}`,
         }))
         .filter((item) => isTodayOrLater(item.date, todayStart))
         .sort(sortByDateAsc);
