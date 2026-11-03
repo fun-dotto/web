@@ -95,4 +95,5 @@ jobs:
           service: ${{ needs.set-env.outputs.service_name }}
           image: ${{ needs.set-env.outputs.image_tag }}
           region: ${{ vars._DEPLOY_REGION }}
+          project_id: ${{ vars.PROJECT_ID }}
           workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
