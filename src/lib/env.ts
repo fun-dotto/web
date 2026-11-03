@@ -30,8 +30,6 @@ export function getFirebaseClientConfig(): FirebaseClientConfig {
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.FIREBASE_APP_ID,
-    appCheckSiteKey: process.env.FIREBASE_APPCHECK_SITE_KEY,
-    appCheckDebugToken: process.env.FIREBASE_APPCHECK_DEBUG_TOKEN,
   };
 }
 

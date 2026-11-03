@@ -1,43 +1,28 @@
-/**
- * Cloud Run のメタデータサーバーから、本サービスのサービスアカウントの Google ID トークンを取得する。
- * App API はこのトークンで呼び出し元が Web であることを確かめ、App Check の検証を省略する。
- */
-
-const METADATA_IDENTITY_URL =
-  "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity";
-
-// ID トークンの有効期限は 1 時間。余裕を持って 50 分で取り直す。
-const TOKEN_TTL_MS = 50 * 60 * 1000;
-const FETCH_TIMEOUT_MS = 2000;
-
-const cache = new Map<string, { token: string; expiresAt: number }>();
+import { GoogleAuth, type IdTokenClient } from "google-auth-library";
 
 /**
- * audience 向けの ID トークンを返す。メタデータサーバーがない環境（ローカル開発など）では undefined を返す。
+ * Web のサービスアカウントの Google ID トークンを取得する。
+ * App API はこのトークンで呼び出し元が Web であることを確かめる。
+ *
+ * Cloud Run ではメタデータサーバーから取得する。ローカル開発では Application Default Credentials を使うため、
+ * `gcloud auth application-default login --impersonate-service-account=web-dev@swift2023groupc.iam.gserviceaccount.com`
+ * でサービスアカウントの権限を借りておく。
+ * トークンのキャッシュと期限切れ前の更新は IdTokenClient が行う。
  */
-export async function getServiceIdToken(
-  audience: string,
-): Promise<string | undefined> {
-  const cached = cache.get(audience);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.token;
-  }
 
-  try {
-    const url = `${METADATA_IDENTITY_URL}?audience=${encodeURIComponent(audience)}`;
-    const res = await fetch(url, {
-      headers: { "Metadata-Flavor": "Google" },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      console.warn(`ID トークンの取得に失敗しました: ${res.status}`);
-      return undefined;
-    }
-    const token = (await res.text()).trim();
-    cache.set(audience, { token, expiresAt: Date.now() + TOKEN_TTL_MS });
-    return token;
-  } catch {
-    return undefined;
+const auth = new GoogleAuth();
+const clients = new Map<string, Promise<IdTokenClient>>();
+
+export async function getServiceIdToken(audience: string): Promise<string> {
+  let client = clients.get(audience);
+  if (!client) {
+    client = auth.getIdTokenClient(audience);
+    clients.set(audience, client);
   }
+  const headers = await (await client).getRequestHeaders();
+  const authorization = headers.get("Authorization");
+  if (!authorization) {
+    throw new Error("Google ID トークンを取得できませんでした");
+  }
+  return authorization;
 }

@@ -16,24 +16,19 @@ const serviceAuthInterceptor =
   (audience: string): Interceptor =>
   (next) =>
   async (req) => {
-    const token = await getServiceIdToken(audience);
-    if (token) {
-      req.header.set("X-Service-Authorization", `Bearer ${token}`);
-    }
+    req.header.set(
+      "X-Service-Authorization",
+      await getServiceIdToken(audience),
+    );
     return next(req);
   };
 
 /**
- * Firebase のトークンを Cookie から読み出し、App API へのリクエストに付与する。
- * App Check トークンは、サービスの ID トークンを取得できないローカル開発などでの代替として送る。
+ * ユーザーの Firebase ID トークンを Cookie から読み出し、App API へのリクエストに付与する。
  */
 const firebaseInterceptor: Interceptor = (next) => async (req) => {
   const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
-  const appCheckToken = cookieStore.get("firebase-app-check-token")?.value;
-  if (appCheckToken) {
-    req.header.set("X-Firebase-AppCheck", appCheckToken);
-  }
   const idToken = cookieStore.get("firebase-id-token")?.value;
   if (idToken) {
     req.header.set("Authorization", `Bearer ${idToken}`);

@@ -2,14 +2,10 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const ID_TOKEN_COOKIE = "firebase-id-token";
-const APP_CHECK_COOKIE = "firebase-app-check-token";
 const MAX_AGE = 60 * 60;
 
 export async function POST(request: Request) {
-  const { idToken, appCheckToken } = (await request.json()) as {
-    idToken?: string;
-    appCheckToken?: string;
-  };
+  const { idToken } = (await request.json()) as { idToken?: string };
   if (!idToken) {
     return NextResponse.json({ error: "idToken is required" }, { status: 400 });
   }
@@ -23,9 +19,6 @@ export async function POST(request: Request) {
     maxAge: MAX_AGE,
   };
   cookieStore.set(ID_TOKEN_COOKIE, idToken, cookieOptions);
-  if (appCheckToken) {
-    cookieStore.set(APP_CHECK_COOKIE, appCheckToken, cookieOptions);
-  }
 
   return NextResponse.json({ ok: true });
 }
@@ -33,6 +26,7 @@ export async function POST(request: Request) {
 export async function DELETE() {
   const cookieStore = await cookies();
   cookieStore.delete(ID_TOKEN_COOKIE);
-  cookieStore.delete(APP_CHECK_COOKIE);
+  // 以前の App Check トークンの Cookie が残っていれば消す
+  cookieStore.delete("firebase-app-check-token");
   return NextResponse.json({ ok: true });
 }

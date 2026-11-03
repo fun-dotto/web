@@ -19,33 +19,13 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-async function getAppCheckToken(
-  config: FirebaseClientConfig,
-): Promise<string | undefined> {
-  const { appCheck } = getFirebaseClient(config);
-  if (!appCheck) return undefined;
-  const { getToken } = await import("firebase/app-check");
-  try {
-    const { token } = await getToken(appCheck, false);
-    return token;
-  } catch {
-    return undefined;
-  }
-}
-
-async function syncSessionCookie(
-  user: User | null,
-  config: FirebaseClientConfig,
-) {
+async function syncSessionCookie(user: User | null) {
   if (user) {
-    const [idToken, appCheckToken] = await Promise.all([
-      user.getIdToken(),
-      getAppCheckToken(config),
-    ]);
+    const idToken = await user.getIdToken();
     await fetch("/api/auth/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken, appCheckToken }),
+      body: JSON.stringify({ idToken }),
     });
   } else {
     await fetch("/api/auth/session", { method: "DELETE" });
@@ -65,7 +45,7 @@ export function AuthProvider({
   useEffect(() => {
     const { auth } = getFirebaseClient(firebaseConfig);
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      await syncSessionCookie(user, firebaseConfig);
+      await syncSessionCookie(user);
       setUser(user);
       setLoading(false);
     });
