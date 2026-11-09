@@ -19,6 +19,17 @@ export function getDottoEnv(): DottoEnv {
 }
 
 /**
+ * 実行環境に対応する公開 URL(末尾スラッシュなし)。
+ * infra の Cloudflare 設定のホスト名規則に合わせる(prd: fun-dotto.com / それ以外: {環境}.fun-dotto.com)。
+ */
+export function getSiteUrl(): string {
+  const env = getDottoEnv();
+  return env === "prd"
+    ? "https://fun-dotto.com"
+    : `https://${env}.fun-dotto.com`;
+}
+
+/**
  * クライアントに渡す Firebase の設定を実行時の環境変数から組み立てる。
  * NEXT_PUBLIC_* はビルド時に埋め込まれるため使わない。
  */
