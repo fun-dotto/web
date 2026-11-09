@@ -63,7 +63,7 @@ const sections: LegalSection[] = [
   {
     title: "お問い合わせ",
     paragraphs: [
-      "本ポリシーに関するお問い合わせは、Dotto 開発チームまでご連絡ください。",
+      "本ポリシーに関するお問い合わせは、Dotto運営事務局までご連絡ください。",
     ],
   },
 ];
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
     <LegalDocument
       title="プライバシーポリシー"
       updatedAt="2026年11月9日"
-      intro="Dotto 開発チーム(以下「当チーム」)は、公立はこだて未来大学ポータルアプリ「Dotto」(以下「本サービス」)における、ユーザーの情報の取り扱いについて、以下のとおり定めます。"
+      intro="Dotto運営事務局(以下「当事務局」)は、公立はこだて未来大学ポータルアプリ「Dotto」(以下「本サービス」)における、ユーザーの情報の取り扱いについて、以下のとおり定めます。"
       sections={sections}
     />
   );
