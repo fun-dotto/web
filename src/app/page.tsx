@@ -422,14 +422,8 @@ export default function Page() {
         {/* 最終 CTA */}
         <section
           id="download"
-          className="relative isolate scroll-mt-14 overflow-hidden bg-accent-brand px-4 py-20 text-center text-white sm:px-6 sm:py-28"
+          className="scroll-mt-14 bg-accent-brand px-4 py-20 text-center text-white sm:px-6 sm:py-28"
         >
-          <Image
-            src={DottoIcon}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-20 -top-20 -z-10 w-80 opacity-10 brightness-0 invert"
-          />
           <div className="mx-auto max-w-2xl">
             <Image
               src={DottoIcon}
@@ -438,13 +432,13 @@ export default function Page() {
               height={72}
               className="mx-auto rounded-2xl bg-white p-2 shadow-xl"
             />
-            <h2 className="mt-6 text-3xl font-bold leading-tight sm:text-4xl">
+            <h2 className="mt-6 text-balance text-3xl font-bold leading-tight sm:text-4xl">
               さあ、Dotto をはじめよう。
             </h2>
-            <p className="mt-4 leading-relaxed text-white/80">
+            <p className="mt-4 text-balance leading-relaxed text-white/80">
               今日から、キャンパスライフがちょっと軽くなります。
             </p>
-            <DownloadButtons tone="dark" className="mt-8 justify-center" />
+            <DownloadButtons className="mt-8 justify-center" />
           </div>
         </section>
       </main>
