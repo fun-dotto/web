@@ -37,16 +37,25 @@ function PageHeader({ pathname }: { pathname: string }) {
 // 未ログインでも閲覧できるページ
 const PUBLIC_PATHS = ["/login", "/privacy", "/terms"];
 
+// プロモーションページ。認証状態に関わらず、サイドバー無しでそのまま表示する。
+const LANDING_PATH = "/";
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.includes(pathname);
+
   useEffect(() => {
-    if (!loading && !user && !PUBLIC_PATHS.includes(pathname)) {
+    if (!loading && !user && !isPublic) {
       router.replace(`/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
-  }, [user, loading, pathname, router]);
+  }, [user, loading, pathname, isPublic, router]);
+
+  if (pathname === LANDING_PATH) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
@@ -56,7 +65,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user && !PUBLIC_PATHS.includes(pathname)) {
+  if (!user && !isPublic) {
     return null;
   }
 

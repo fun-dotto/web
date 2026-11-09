@@ -8,7 +8,7 @@ export default function SignInPage() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/";
+  const redirectTo = searchParams.get("redirectTo") || "/course";
 
   useEffect(() => {
     if (!loading && user) {
