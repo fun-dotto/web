@@ -34,13 +34,16 @@ function PageHeader({ pathname }: { pathname: string }) {
   );
 }
 
+// 未ログインでも閲覧できるページ
+const PUBLIC_PATHS = ["/login", "/privacy", "/terms"];
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user && pathname !== "/login") {
+    if (!loading && !user && !PUBLIC_PATHS.includes(pathname)) {
       router.replace(`/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
   }, [user, loading, pathname, router]);
@@ -53,7 +56,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user && pathname !== "/login") {
+  if (!user && !PUBLIC_PATHS.includes(pathname)) {
     return null;
   }
 
