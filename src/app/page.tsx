@@ -5,6 +5,7 @@ import {
   CalendarDaysIcon,
   CheckIcon,
   ClipboardListIcon,
+  DownloadIcon,
   GlobeIcon,
   MapIcon,
   SearchIcon,
@@ -190,15 +191,16 @@ export default function Page() {
             </a>
             <a
               href="#download"
-              className="hidden rounded-full px-3 py-1.5 text-sm font-medium text-label-secondary transition-colors hover:text-accent-brand sm:block"
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent-brand px-4 py-1.5 text-sm font-bold text-white transition-colors hover:bg-accent-brand/90"
             >
+              <DownloadIcon className="size-4" aria-hidden="true" />
               ダウンロード
             </a>
             <Link
               href="/course"
-              className="rounded-full bg-accent-brand px-4 py-1.5 text-sm font-bold text-white transition-colors hover:bg-accent-brand/90"
+              className="rounded-full border border-accent-brand/30 px-4 py-1.5 text-sm font-bold text-accent-brand transition-colors hover:bg-accent-brand/10"
             >
-              Web 版を開く
+              Webで開く
             </Link>
           </nav>
         </div>
@@ -398,7 +400,7 @@ export default function Page() {
                 href="/course"
                 className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-label-primary transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/30"
               >
-                Web 版を開く
+                Webで開く
                 <ArrowRightIcon className="size-4" aria-hidden="true" />
               </Link>
             </div>
