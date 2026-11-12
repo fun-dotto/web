@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY --from=oven/bun:1.4.4-alpine /usr/local/bin/bun /usr/local/bin/bun
-COPY package.json bun.lock bunfig.toml ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 

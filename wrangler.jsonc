@@ -1,6 +1,0 @@
-{
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "dotto-web-storybook",
-  "pages_build_output_dir": "./storybook-static",
-  "compatibility_date": "2026-07-14"
-}
