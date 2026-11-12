@@ -5,7 +5,5 @@ export default defineConfig({
   worker: {
     name: "dotto-web-storybook",
     compatibilityDate: "2026-11-09",
-    compatibilityFlags: ["nodejs_compat"],
-    entrypoint: "@tanstack/react-start/server-entry",
   },
 });
