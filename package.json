@@ -1,22 +1,17 @@
 {
   "name": "dotto",
   "version": "0.1.0",
-  "packageManager": "pnpm@12.15.0",
   "private": true,
-  "engines": {
-    "node": "26.13.1"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "format": "biome format",
+    "lint": "biome lint",
     "check": "biome check",
-    "fix": "biome check --write",
-    "ci-check": "biome ci .",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "preview:storybook": "wrangler pages dev storybook-static",
-    "deploy:storybook": "pnpm build:storybook && wrangler pages deploy storybook-static --project-name dotto-web-storybook"
+    "deploy:storybook": "bun run build:storybook && cf deploy"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
@@ -46,10 +41,9 @@
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@typescript/native": "npm:typescript@7.0.2",
+    "cf": "1.0.0-beta.30",
     "storybook": "10.6.7",
     "tailwindcss": "4.3.5",
-    "typescript": "npm:@typescript/typescript6@6.0.2",
-    "wrangler": "4.160.1"
+    "typescript": "7.0.2"
   }
 }

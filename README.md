@@ -10,5 +10,5 @@
 
 ```bash
 mise bootstrap
-pnpm dev
+bun run dev
 ```

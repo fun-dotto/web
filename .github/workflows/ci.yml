@@ -32,8 +32,8 @@ jobs:
         with:
           github_token: ${{ github.token }}
           cache: true
-      - run: pnpm install
-      - run: pnpm build
+      - run: bun install --frozen-lockfile
+      - run: bun run build
 
   lint:
     name: Lint
@@ -45,5 +45,5 @@ jobs:
         with:
           github_token: ${{ github.token }}
           cache: true
-      - run: pnpm install
-      - run: pnpm ci-check
+      - run: bun install --frozen-lockfile
+      - run: bunx biome ci .

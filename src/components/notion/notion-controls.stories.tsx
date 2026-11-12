@@ -18,8 +18,8 @@ export const CopyMarkdown: Story = {
 export const CopyCode: Story = {
   render: () => (
     <div className="group relative rounded-lg bg-background-tertiary p-6 pr-32 text-label-tertiary">
-      <code>pnpm storybook</code>
-      <CopyCodeButton code="pnpm storybook" />
+      <code>bun storybook</code>
+      <CopyCodeButton code="bun storybook" />
     </div>
   ),
 };
