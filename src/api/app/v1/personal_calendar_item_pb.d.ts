@@ -118,7 +118,7 @@ export declare type ListPersonalCalendarItemsRequest = Message<"app.v1.ListPerso
   /**
    * 日付のリスト。指定した日付の個人カレンダーアイテムのみを取得する。
    *
-   * @generated from field: repeated google.type.Date dates = 3;
+   * @generated from field: repeated google.type.Date dates = 1;
    */
   dates: Date[];
 };

@@ -102,7 +102,7 @@ export declare type ListMenuItemsRequest = Message<"app.v1.ListMenuItemsRequest"
   /**
    * メニューを取得する日付。
    *
-   * @generated from field: google.type.Date date = 3;
+   * @generated from field: google.type.Date date = 1;
    */
   date?: Date | undefined;
 };

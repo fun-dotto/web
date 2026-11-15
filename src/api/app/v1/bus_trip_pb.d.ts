@@ -85,7 +85,7 @@ export declare type ListBusTripsRequest = Message<"app.v1.ListBusTripsRequest"> 
   /**
    * 運行情報を取得する日付。
    *
-   * @generated from field: google.type.Date date = 3;
+   * @generated from field: google.type.Date date = 1;
    */
   date?: Date | undefined;
 };
