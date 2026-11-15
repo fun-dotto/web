@@ -69,21 +69,21 @@ export declare type ListReservationsRequest = Message<"app.v1.ListReservationsRe
   /**
    * 教室IDのリスト。空の場合は全教室を対象とする。
    *
-   * @generated from field: repeated string room_ids = 3;
+   * @generated from field: repeated string room_ids = 1;
    */
   roomIds: string[];
 
   /**
    * 検索対象の開始日時。未設定の場合は開始日時で絞り込まない。
    *
-   * @generated from field: optional google.protobuf.Timestamp from_time = 4;
+   * @generated from field: optional google.protobuf.Timestamp from_time = 2;
    */
   fromTime?: Timestamp | undefined;
 
   /**
    * 検索対象の終了日時。未設定の場合は終了日時で絞り込まない。
    *
-   * @generated from field: optional google.protobuf.Timestamp until_time = 5;
+   * @generated from field: optional google.protobuf.Timestamp until_time = 3;
    */
   untilTime?: Timestamp | undefined;
 };

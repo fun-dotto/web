@@ -55,7 +55,7 @@ export declare type ListBusTimetableStopsRequest = Message<"app.v1.ListBusTimeta
   /**
    * 運行ID。
    *
-   * @generated from field: string trip_id = 3;
+   * @generated from field: string trip_id = 1;
    */
   tripId: string;
 };

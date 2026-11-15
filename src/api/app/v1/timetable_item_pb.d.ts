@@ -91,14 +91,14 @@ export declare type ListTimetableItemsRequest = Message<"app.v1.ListTimetableIte
   /**
    * 開講年度。未設定の場合は今年度。
    *
-   * @generated from field: optional int32 year = 3;
+   * @generated from field: optional int32 year = 1;
    */
   year?: number | undefined;
 
   /**
    * 開講時期。
    *
-   * @generated from field: repeated app.v1.SubjectSemester semesters = 4;
+   * @generated from field: repeated app.v1.SubjectSemester semesters = 2;
    */
   semesters: SubjectSemester[];
 };

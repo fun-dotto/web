@@ -70,21 +70,21 @@ export declare type ListCancelledClassesRequest = Message<"app.v1.ListCancelledC
   /**
    * 科目IDのリスト。指定した科目の休講のみを取得する。空の場合は全科目を対象とする。
    *
-   * @generated from field: repeated string subject_ids = 3;
+   * @generated from field: repeated string subject_ids = 1;
    */
   subjectIds: string[];
 
   /**
    * 検索対象の開始日付。未設定の場合は開始日付で絞り込まない。
    *
-   * @generated from field: optional google.type.Date from_date = 4;
+   * @generated from field: optional google.type.Date from_date = 2;
    */
   fromDate?: Date | undefined;
 
   /**
    * 検索対象の終了日付。未設定の場合は終了日付で絞り込まない。
    *
-   * @generated from field: optional google.type.Date until_date = 5;
+   * @generated from field: optional google.type.Date until_date = 3;
    */
   untilDate?: Date | undefined;
 };
