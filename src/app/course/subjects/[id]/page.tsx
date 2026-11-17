@@ -91,7 +91,6 @@ export default async function Page({
     { label: "履修上の留意点", value: syllabus?.notes },
     { label: "キーワード", value: syllabus?.keywords },
     { label: "対象コース・領域", value: syllabus?.targetCourses },
-    { label: "対象領域", value: syllabus?.targetAreas },
     { label: "科目群・科目区分", value: syllabus?.classifications },
     { label: "教授言語", value: syllabus?.teachingLanguage },
     { label: "授業内容とスケジュール", value: syllabus?.contentsAndSchedule },
