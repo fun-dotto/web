@@ -47,15 +47,12 @@ export function usePageHeaderActions(): React.ReactNode | null {
 }
 
 export function PageHeaderTitle({ title }: { title: string }) {
+  // 未ログイン時など、ヘッダーが無いレイアウトでは Provider が存在しないので何もしない。
   const context = useContext(PageHeaderTitleContext);
-  if (!context) {
-    throw new Error(
-      "PageHeaderTitle must be used within a PageHeaderTitleProvider",
-    );
-  }
-  const { setTitle } = context;
+  const setTitle = context?.setTitle;
 
   useEffect(() => {
+    if (!setTitle) return;
     setTitle(title);
     return () => setTitle(null);
   }, [title, setTitle]);
@@ -64,15 +61,12 @@ export function PageHeaderTitle({ title }: { title: string }) {
 }
 
 export function PageHeaderActions({ children }: { children: React.ReactNode }) {
+  // 未ログイン時など、ヘッダーが無いレイアウトでは Provider が存在しないので何もしない。
   const context = useContext(PageHeaderTitleContext);
-  if (!context) {
-    throw new Error(
-      "PageHeaderActions must be used within a PageHeaderTitleProvider",
-    );
-  }
-  const { setActions } = context;
+  const setActions = context?.setActions;
 
   useEffect(() => {
+    if (!setActions) return;
     setActions(children);
     return () => setActions(null);
   }, [children, setActions]);
