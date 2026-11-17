@@ -52,6 +52,9 @@ export function LegalDocument({
         <Link href="/terms" className="hover:underline">
           利用規約
         </Link>
+        <Link href="/contact" className="hover:underline">
+          お問い合わせ
+        </Link>
       </nav>
     </div>
   );
