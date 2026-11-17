@@ -100,193 +100,291 @@ export declare const SubjectRequirementSchema: GenMessage<SubjectRequirement>;
  */
 export declare type SubjectSyllabus = Message<"app.v1.SubjectSyllabus"> & {
   /**
-   * 教務システムのシラバスID。
+   * ID（UUID）。
    *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
+   * 授業コード（教務システムのシラバスID）。
+   *
+   * @generated from field: string lesson_id = 2;
+   */
+  lessonId: string;
+
+  /**
+   * 年度。
+   *
+   * @generated from field: int32 year = 3;
+   */
+  year: number;
+
+  /**
    * 授業名。
    *
-   * @generated from field: string name = 2;
+   * @generated from field: string name = 4;
    */
   name: string;
 
   /**
-   * 授業名（英語）。
+   * 授業名（英語）。Course。
    *
-   * @generated from field: string en_name = 3;
+   * @generated from field: string en_name = 5;
    */
   enName: string;
 
   /**
    * 配当年次。
    *
-   * @generated from field: string grades = 4;
+   * @generated from field: string grades = 6;
    */
   grades: string;
 
   /**
-   * 単位数。
+   * 開講期（一部の科目では「予定開講期」）。
    *
-   * @generated from field: int32 credit = 5;
+   * @generated from field: string term = 7;
    */
-  credit: number;
+  term: string;
 
   /**
-   * 担当教員名。
+   * 単位数（例: `2単位`）。
    *
-   * @generated from field: string faculty_names = 6;
+   * @generated from field: string credit = 8;
+   */
+  credit: string;
+
+  /**
+   * 担当教員名（改行区切り、主担当に `◎`）。
+   *
+   * @generated from field: string faculty_names = 9;
    */
   facultyNames: string;
 
   /**
    * 実務家教員区分。
    *
-   * @generated from field: string practical_home_faculty_category = 7;
+   * @generated from field: string practical_home_faculty_category = 10;
    */
   practicalHomeFacultyCategory: string;
 
   /**
    * 複数人担当形式。
    *
-   * @generated from field: string multiple_person_teaching_form = 8;
+   * @generated from field: string multiple_person_teaching_form = 11;
    */
   multiplePersonTeachingForm: string;
 
   /**
    * 授業形態。
    *
-   * @generated from field: string teaching_form = 9;
+   * @generated from field: string teaching_form = 12;
    */
   teachingForm: string;
 
   /**
    * 授業の概要。
    *
-   * @generated from field: string summary = 10;
+   * @generated from field: string summary = 13;
    */
   summary: string;
 
   /**
    * 授業の到達目標。
    *
-   * @generated from field: string learning_outcomes = 11;
+   * @generated from field: string learning_outcomes = 14;
    */
   learningOutcomes: string;
 
   /**
    * 提出課題等。
    *
-   * @generated from field: string assignments = 12;
+   * @generated from field: string assignments = 15;
    */
   assignments: string;
 
   /**
    * 成績の評価方法・基準。
    *
-   * @generated from field: string evaluation_method = 13;
+   * @generated from field: string evaluation_method = 16;
    */
   evaluationMethod: string;
 
   /**
    * テキスト。
    *
-   * @generated from field: string textbooks = 14;
+   * @generated from field: string textbooks = 17;
    */
   textbooks: string;
 
   /**
    * 参考書。
    *
-   * @generated from field: string reference_books = 15;
+   * @generated from field: string reference_books = 18;
    */
   referenceBooks: string;
 
   /**
    * 履修条件。
    *
-   * @generated from field: string prerequisites = 16;
+   * @generated from field: string prerequisites = 19;
    */
   prerequisites: string;
 
   /**
    * 事前学習。
    *
-   * @generated from field: string pre_learning = 17;
+   * @generated from field: string pre_learning = 20;
    */
   preLearning: string;
 
   /**
    * 事後学習。
    *
-   * @generated from field: string post_learning = 18;
+   * @generated from field: string post_learning = 21;
    */
   postLearning: string;
 
   /**
    * 履修上の留意点。
    *
-   * @generated from field: string notes = 19;
+   * @generated from field: string notes = 22;
    */
   notes: string;
 
   /**
-   * キーワード。
+   * キーワード/keywords。
    *
-   * @generated from field: string keywords = 20;
+   * @generated from field: string keywords = 23;
    */
   keywords: string;
 
   /**
    * 対象コース・領域。
    *
-   * @generated from field: string target_courses = 21;
+   * @generated from field: string target_courses = 24;
    */
   targetCourses: string;
 
   /**
-   * 対象領域。
-   *
-   * @generated from field: string target_areas = 22;
-   */
-  targetAreas: string;
-
-  /**
    * 科目群・科目区分。
    *
-   * @generated from field: string classifications = 23;
+   * @generated from field: string classifications = 25;
    */
   classifications: string;
 
   /**
+   * DSOP対象科目。
+   *
+   * @generated from field: string dsop_subject = 26;
+   */
+  dsopSubject: string;
+
+  /**
    * 教授言語。
    *
-   * @generated from field: string teaching_language = 24;
+   * @generated from field: string teaching_language = 27;
    */
   teachingLanguage: string;
 
   /**
-   * 授業内容とスケジュール。
-   *
-   * @generated from field: string contents_and_schedule = 25;
-   */
-  contentsAndSchedule: string;
-
-  /**
    * 授業・試験の形式。
    *
-   * @generated from field: string teaching_and_exam_form = 26;
+   * @generated from field: string teaching_and_exam_form = 28;
    */
   teachingAndExamForm: string;
 
   /**
-   * DSOP 対象科目。
+   * 授業内容とスケジュール。
    *
-   * @generated from field: string dsop_subject = 27;
+   * @generated from field: string contents_and_schedule = 29;
    */
-  dsopSubject: string;
+  contentsAndSchedule: string;
+
+  /**
+   * (E)Course outline。
+   *
+   * @generated from field: string en_summary = 30;
+   */
+  enSummary: string;
+
+  /**
+   * (E)Course Objectives。
+   *
+   * @generated from field: string en_learning_outcomes = 31;
+   */
+  enLearningOutcomes: string;
+
+  /**
+   * (E)Course Schedule。
+   *
+   * @generated from field: string en_contents_and_schedule = 32;
+   */
+  enContentsAndSchedule: string;
+
+  /**
+   * (E)Assessment。
+   *
+   * @generated from field: string en_evaluation_method = 33;
+   */
+  enEvaluationMethod: string;
+
+  /**
+   * (E)Language of Instruction。
+   *
+   * @generated from field: string en_teaching_language = 34;
+   */
+  enTeachingLanguage: string;
+
+  /**
+   * (E)Requirements for registration。
+   *
+   * @generated from field: string en_prerequisites = 35;
+   */
+  enPrerequisites: string;
+
+  /**
+   * (E)Prior/Post Assignment。
+   *
+   * @generated from field: string en_pre_post_learning = 36;
+   */
+  enPrePostLearning: string;
+
+  /**
+   * (E)Textbooks。
+   *
+   * @generated from field: string en_textbooks = 37;
+   */
+  enTextbooks: string;
+
+  /**
+   * (E)Note。
+   *
+   * @generated from field: string en_notes = 38;
+   */
+  enNotes: string;
+
+  /**
+   * (E)Type of class and exam。
+   *
+   * @generated from field: string en_teaching_and_exam_form = 39;
+   */
+  enTeachingAndExamForm: string;
+
+  /**
+   * ディプロマポリシー。
+   *
+   * @generated from field: string diploma_policies = 40;
+   */
+  diplomaPolicies: string;
+
+  /**
+   * ディプロマポリシーとの対応（例: `DP2,DP4`）。
+   *
+   * @generated from field: string diploma_policy_correspondence = 41;
+   */
+  diplomaPolicyCorrespondence: string;
 };
 
 /**
@@ -381,56 +479,56 @@ export declare type ListSubjectsRequest = Message<"app.v1.ListSubjectsRequest"> 
   /**
    * 検索ワード。空文字の場合は絞り込まない。
    *
-   * @generated from field: string query = 3;
+   * @generated from field: string query = 1;
    */
   query: string;
 
   /**
    * 学年。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.Grade grades = 4;
+   * @generated from field: repeated app.v1.Grade grades = 2;
    */
   grades: Grade[];
 
   /**
    * コース。大学院の場合は大学院コースに読み替える。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.Course courses = 5;
+   * @generated from field: repeated app.v1.Course courses = 3;
    */
   courses: Course[];
 
   /**
    * クラス。大学院の学年を指定した場合は指定できない。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.Class classes = 6;
+   * @generated from field: repeated app.v1.Class classes = 4;
    */
   classes: Class[];
 
   /**
    * 科目カテゴリ（学部: 専門・教養、大学院: 専門・研究指導）。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.SubjectClassification classifications = 7;
+   * @generated from field: repeated app.v1.SubjectClassification classifications = 5;
    */
   classifications: SubjectClassification[];
 
   /**
    * 開講時期。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.SubjectSemester semesters = 8;
+   * @generated from field: repeated app.v1.SubjectSemester semesters = 6;
    */
   semesters: SubjectSemester[];
 
   /**
    * 必修・選択・選択必修。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.SubjectRequirementType requirement_types = 9;
+   * @generated from field: repeated app.v1.SubjectRequirementType requirement_types = 7;
    */
   requirementTypes: SubjectRequirementType[];
 
   /**
    * 教養科目カテゴリ。空の場合は絞り込まない。
    *
-   * @generated from field: repeated app.v1.SubjectCulturalSubjectCategory cultural_subject_categories = 10;
+   * @generated from field: repeated app.v1.SubjectCulturalSubjectCategory cultural_subject_categories = 8;
    */
   culturalSubjectCategories: SubjectCulturalSubjectCategory[];
 };
