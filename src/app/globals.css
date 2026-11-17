@@ -174,3 +174,63 @@
     }
   }
 }
+/* microCMS のリッチエディタで書かれた記事本文 */
+@layer components {
+  .article-body {
+    @apply text-sm leading-relaxed text-label-primary break-words;
+  }
+  .article-body > * + * {
+    @apply mt-4;
+  }
+  .article-body h1 {
+    @apply mt-10 text-xl font-bold;
+  }
+  .article-body h2 {
+    @apply mt-8 text-lg font-bold;
+  }
+  .article-body h3,
+  .article-body h4,
+  .article-body h5 {
+    @apply mt-6 text-base font-semibold;
+  }
+  .article-body a {
+    @apply underline underline-offset-2;
+  }
+  .article-body ul {
+    @apply list-disc pl-6;
+  }
+  .article-body ol {
+    @apply list-decimal pl-6;
+  }
+  .article-body li + li {
+    @apply mt-1;
+  }
+  .article-body blockquote {
+    @apply border-l-2 border-border-primary pl-4 text-label-secondary;
+  }
+  .article-body code {
+    @apply rounded bg-black/5 px-1 py-0.5 font-mono text-xs;
+  }
+  .article-body pre {
+    @apply overflow-x-auto rounded-md bg-black/5 p-4;
+  }
+  .article-body pre code {
+    @apply bg-transparent p-0;
+  }
+  .article-body img {
+    @apply h-auto max-w-full rounded-md;
+  }
+  .article-body iframe {
+    @apply aspect-video h-auto w-full;
+  }
+  .article-body table {
+    @apply w-full border-collapse;
+  }
+  .article-body th,
+  .article-body td {
+    @apply border border-border-primary px-3 py-2 text-left;
+  }
+  .article-body hr {
+    @apply border-border-primary;
+  }
+}
