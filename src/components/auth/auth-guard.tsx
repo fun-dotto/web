@@ -35,7 +35,7 @@ function PageHeader({ pathname }: { pathname: string }) {
 }
 
 // 未ログインでも閲覧できるページ
-const PUBLIC_PATHS = ["/login", "/privacy", "/terms"];
+const PUBLIC_PATHS = ["/login", "/privacy", "/terms", "/contact"];
 
 // プロモーションページ。認証状態に関わらず、サイドバー無しでそのまま表示する。
 const LANDING_PATH = "/";

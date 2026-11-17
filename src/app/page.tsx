@@ -459,6 +459,9 @@ export default function Page() {
             <Link href="/privacy" className="hover:underline">
               プライバシーポリシー
             </Link>
+            <Link href="/contact" className="hover:underline">
+              お問い合わせ
+            </Link>
           </nav>
         </div>
       </footer>
