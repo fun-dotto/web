@@ -14,9 +14,7 @@ export const navSections = [
   },
   {
     label: "設定",
-    items: [
-      { title: "お知らせ", href: "/setting/announcements", icon: BellIcon },
-    ],
+    items: [{ title: "お知らせ", href: "/articles", icon: BellIcon }],
   },
   {
     label: "その他",

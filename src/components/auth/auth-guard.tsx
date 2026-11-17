@@ -37,6 +37,19 @@ function PageHeader({ pathname }: { pathname: string }) {
 // 未ログインでも閲覧できるページ
 const PUBLIC_PATHS = ["/login", "/privacy", "/terms", "/contact"];
 
+// 配下も含めて未ログインで閲覧できるページ（アプリの WebView から開かれる記事など）
+const PUBLIC_PATH_PREFIXES = ["/articles"];
+
+function isPublicPath(pathname: string): boolean {
+  return (
+    pathname === LANDING_PATH ||
+    PUBLIC_PATHS.includes(pathname) ||
+    PUBLIC_PATH_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    )
+  );
+}
+
 // プロモーションページ。認証状態に関わらず、サイドバー無しでそのまま表示する。
 const LANDING_PATH = "/";
 
@@ -45,7 +58,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.includes(pathname);
+  const isPublic = isPublicPath(pathname);
 
   useEffect(() => {
     if (!loading && !user && !isPublic) {
